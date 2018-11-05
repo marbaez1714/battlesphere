@@ -1,0 +1,43 @@
+.inputBox{
+    width:80%;
+    margin-top: 1vmax;
+    margin-left:10%;
+    margin-right:10%;
+
+}
+
+.cardInformation { 
+    margin-top:1vmax;
+
+}
+
+.cardImage{
+    width:100%
+}
+
+.cardData {
+    width:100%;
+    text-align: left;
+    font-size: 1.25rem ;
+    font-weight: 500 ;
+    line-height: 1.2 ;
+    /* margin-left:10%;
+    margin-right:10% */
+    
+}
+
+.card{
+    border-color: #6c757d !important;
+}
+
+.card-body{
+     border-top-style: solid ;
+     border-color: #6c757d
+}
+
+
+.card-title{
+    font-size:1.5rem;
+    text-align: left;
+    color:#282c34;
+}
