@@ -88,10 +88,10 @@ class App extends Component {
 				<header className="App-header">
 					<img src={logo} className="App-logo" alt="logo" />
 				</header>
-				{/* <HomePage /> */}
-				<CardSearch handleSearchChange={this.handleSearchChange}
+				<HomePage />
+				{/* <CardSearch handleSearchChange={this.handleSearchChange}
 					handleFuzzySearch={this.handleFuzzySearch}
-					cardSearchState={this.state.cardSearchState} />
+					cardSearchState={this.state.cardSearchState} /> */}
 			</div>
 		);
 	}
