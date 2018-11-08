@@ -24,30 +24,36 @@ function CardLegal(props) {
         }
     }
     return (
-        <Table style={{ margin: "0" }}>
-            <tbody style={{ fontSize: '1rem' }}>
-                <tr>
-                    <td>{legal(cardLegal.standard, "Standard")}</td>
-                    <td>{legal(cardLegal.frontier, "Frontier")}</td>
-                </tr>
-                <tr>
-                    <td>{legal(cardLegal.modern, "Modern")}</td>
-                    <td>{legal(cardLegal.pauper, "Pauper")}</td>
-                </tr>
-                <tr>
-                    <td>{legal(cardLegal.legacy, "Legacy")}</td>
-                    <td>{legal(cardLegal.penny, "Penny")}</td>
-                </tr>
-                <tr>
-                    <td>{legal(cardLegal.vintage, "Vintage")}</td>
-                    <td>{legal(cardLegal.oneVone, "1v1 Cmdr")}</td>
-                </tr>
-                <tr>
-                    <td>{legal(cardLegal.commander, "Commander")}</td>
-                    <td>{legal(cardLegal.brawl, "Brawl")}</td>
-                </tr>
-            </tbody>
-        </Table>
+        <div>
+            <CardBody>
+                <CardSubtitle>Card Legalities:</CardSubtitle>
+
+            </CardBody >
+            <Table style={{ margin: "0" }}>
+                <tbody style={{ fontSize: '1rem' }}>
+                    <tr>
+                        <td style={{ width: "50%" }}>{legal(cardLegal.standard, "Standard")}</td>
+                        <td>{legal(cardLegal.frontier, "Frontier")}</td>
+                    </tr>
+                    <tr>
+                        <td>{legal(cardLegal.modern, "Modern")}</td>
+                        <td>{legal(cardLegal.pauper, "Pauper")}</td>
+                    </tr>
+                    <tr>
+                        <td>{legal(cardLegal.legacy, "Legacy")}</td>
+                        <td>{legal(cardLegal.penny, "Penny")}</td>
+                    </tr>
+                    <tr>
+                        <td>{legal(cardLegal.vintage, "Vintage")}</td>
+                        <td>{legal(cardLegal.oneVone, "1v1 Cmdr")}</td>
+                    </tr>
+                    <tr>
+                        <td>{legal(cardLegal.commander, "Commander")}</td>
+                        <td>{legal(cardLegal.brawl, "Brawl")}</td>
+                    </tr>
+                </tbody>
+            </Table>
+        </div>
 
 
     )

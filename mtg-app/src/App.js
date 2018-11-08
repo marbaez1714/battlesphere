@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
+import { Button } from 'reactstrap';
 import HomePage from './pages/home/home';
 import CardSearch from './pages/card-search/card-search'
+import Planechase from './pages/planechase/planechase'
 import OopsPage from './pages/oops';
 import axios from 'axios';
 import logo from './logo.svg';
@@ -11,6 +13,15 @@ class App extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			renderStates: {
+				cardSearch: false,
+				deckBuilder: false,
+				battleCounter: false,
+				planechase: false,
+				home: true,
+
+
+			},
 			cardSearchState: {
 				inputValue: '',
 				cardName: 'Card Name',
@@ -33,8 +44,12 @@ class App extends Component {
 				}
 			}
 		}
+
 		this.handleSearchChange = this.handleSearchChange.bind(this);
 		this.handleFuzzySearch = this.handleFuzzySearch.bind(this);
+		this.renderCardSearch = this.renderCardSearch.bind(this);
+		this.renderPlanechase = this.renderPlanechase.bind(this);
+		this.renderHome = this.renderHome.bind(this);
 	}
 
 	handleSearchChange(event) {
@@ -51,6 +66,7 @@ class App extends Component {
 			cardLegal = searchState.legalities;
 		axios.get(searchUrl).then(function (response) {
 			let cardData = response.data;
+			console.log(cardData)
 			searchState.cardPrice = '$ ' + cardData.usd;
 			searchState.cardName = cardData.name;
 			searchState.cardType = cardData.type_line;
@@ -70,10 +86,22 @@ class App extends Component {
 			self.setState({ cardSearchState: searchState })
 			console.log(searchState);
 		}).catch(function (error) {
+			searchState.legalities.standard = "not_legal"
+			searchState.legalities.future = "not_legal"
+			searchState.legalities.frontier = "not_legal"
+			searchState.legalities.modern = "not_legal"
+			searchState.legalities.legacy = "not_legal"
+			searchState.legalities.pauper = "not_legal"
+			searchState.legalities.vintage = "not_legal"
+			searchState.legalities.penny = "not_legal"
+			searchState.legalities.commander = "not_legal"
+			searchState.legalities.oneVone = "not_legal"
+			searchState.legalities.duel = "not_legal"
+			searchState.legalities.brawl = "not_legal"
 			searchState.cardName = "Can't find a card by that name :(";
 			searchState.cardPrice = "$ 3.50";
 			searchState.cardType = "Please try again! ";
-			searchState.cardUri = "https://mtgcardsmith.com/view/complete/full/2015/6/13/1434239168168075.png";
+			searchState.cardUri = "https://img.scryfall.com/cards/large/en/unh/120a.jpg?1517813031";
 			self.setState({ cardSearchState: searchState })
 			console.log("Opps! Something went wront!: ", error);
 		});
@@ -81,17 +109,52 @@ class App extends Component {
 		event.preventDefault();
 	}
 
+	renderCardSearch(event) {
+		let renderStates = this.state.renderStates
+		Object.keys(renderStates).forEach(key => renderStates[key] = false);
+		renderStates.cardSearch = true;
+		this.setState({ renderStates: renderStates })
+	}
+
+	renderPlanechase(event) {
+		let renderStates = this.state.renderStates
+		Object.keys(renderStates).forEach(key => renderStates[key] = false);
+		renderStates.planechase = true;
+		this.setState({ renderStates: renderStates });
+	}
+
+	renderHome(event) {
+		let renderStates = this.state.renderStates
+		Object.keys(renderStates).forEach(key => renderStates[key] = false);
+		renderStates.home = true;
+		this.setState({ renderStates: renderStates });
+	}
+
+
 
 	render() {
+		let home = <HomePage renderCardSearch={this.renderCardSearch}
+			renderPlanechase={this.renderPlanechase} />,
+			cardSearch = <CardSearch handleSearchChange={this.handleSearchChange}
+				handleFuzzySearch={this.handleFuzzySearch}
+				cardSearchState={this.state.cardSearchState} />,
+			planechase = <Planechase />
+
+
+
 		return (
 			<div className="App" >
 				<header className="App-header">
-					<img src={logo} className="App-logo" alt="logo" />
+					{/* <img src={logo} className="App-logo" alt="logo" /> */}
+					<Button onClick={this.renderHome}>Close!</Button>
 				</header>
-				{/* <HomePage /> */}
-				<CardSearch handleSearchChange={this.handleSearchChange}
-					handleFuzzySearch={this.handleFuzzySearch}
-					cardSearchState={this.state.cardSearchState} />
+
+				{this.state.renderStates.home ? home : ''}
+
+				{this.state.renderStates.cardSearch ? cardSearch : ''}
+
+				{this.state.renderStates.planechase ? planechase : ''}
+
 			</div>
 		);
 	}

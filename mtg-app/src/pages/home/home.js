@@ -19,7 +19,7 @@ export default function HomePage(props) {
                     </Button>
                 </Col>
                 <Col md="4" className="cards">
-                    <Button id="menuCard">
+                    <Button id="menuCard" onClick={props.renderCardSearch}>
                         <CardImg top width="100%" src={imageCardSearch} />
                         <p className="cardTitle"> Card Search </p>
                     </Button>
@@ -31,7 +31,7 @@ export default function HomePage(props) {
                     </Button>
                 </Col>
                 <Col md="4" className="cards">
-                    <Button id="menuCard">
+                    <Button id="menuCard" onClick={props.renderPlanechase}>
                         <CardImg top width="100%" src={imagePlanechase} />
                         <p className="cardTitle"> Planechase </p>
                     </Button>
