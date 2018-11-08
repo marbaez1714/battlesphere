@@ -5,6 +5,7 @@ import './style.css'
 export default function HomePage(props) {
 
     let imageDeckBuilder = "https://img.scryfall.com/cards/art_crop/en/soi/231.jpg?1517813031",
+        imageAbout = "https://img.scryfall.com/cards/art_crop/en/c18/212.jpg?1535504874",
         imageCardSearch = "https://img.scryfall.com/cards/art_crop/en/vma/70.jpg?1517813031",
         imageSetLists = "https://img.scryfall.com/cards/art_crop/en/hou/166.jpg?1517813031",
         imagePlanechase = "https://img.scryfall.com/cards/art_crop/en/c16/143.jpg?1517813031",
@@ -14,12 +15,18 @@ export default function HomePage(props) {
             <Row>
                 <Col md="4" className="cards">
                     <Button id="menuCard">
+                        <CardImg top width="100%" src={imageAbout} />
+                        <p className="cardTitle"> About Battlesphere </p>
+                    </Button>
+                </Col>
+                <Col md="4" className="cards">
+                    <Button id="menuCard">
                         <CardImg top width="100%" src={imageDeckBuilder} />
                         <p className="cardTitle"> Deck Builder </p>
                     </Button>
                 </Col>
                 <Col md="4" className="cards">
-                    <Button id="menuCard">
+                    <Button id="menuCard" onClick={props.renderCardSearch}>
                         <CardImg top width="100%" src={imageCardSearch} />
                         <p className="cardTitle"> Card Search </p>
                     </Button>
@@ -31,7 +38,7 @@ export default function HomePage(props) {
                     </Button>
                 </Col>
                 <Col md="4" className="cards">
-                    <Button id="menuCard">
+                    <Button id="menuCard" onClick={props.renderPlanechase}>
                         <CardImg top width="100%" src={imagePlanechase} />
                         <p className="cardTitle"> Planechase </p>
                     </Button>
