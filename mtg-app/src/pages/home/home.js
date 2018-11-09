@@ -14,7 +14,7 @@ export default function HomePage(props) {
         <Container>
             <Row>
                 <Col md="4" className="cards">
-                    <Button id="menuCard">
+                    <Button id="menuCard" onClick={props.renderAbout}>
                         <CardImg top width="100%" src={imageAbout} />
                         <p className="cardTitle"> About Battlesphere </p>
                     </Button>
