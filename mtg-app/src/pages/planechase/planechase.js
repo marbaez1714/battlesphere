@@ -1,9 +1,10 @@
 import React from 'react';
 import { Button, Card, CardHeader, CardSubtitle, CardBody, Container, Col, Row, Table } from 'reactstrap';
 import './style.css'
-export default function Planechase(props) {
+
+function DeckBuilder(props) {
     return (
-        <Container style={{ visibility: props.planechaseState.visibility }}>
+        <Container>
             <Row className="cardBackContainer">
                 <Col md="6" className="imageContainer">
                     <img style={{ width: "95%" }} src={props.planechaseState.cardBack} alt='' />
@@ -33,5 +34,25 @@ export default function Planechase(props) {
                 </tbody>
             </Table>
         </Container >
+    )
+}
+
+function PlanechaseGame(props) {
+    return (
+        <Container>
+            <h1 >heheheehehe</h1>
+            <img src={props.planechaseState.gameData[0].image} style={{ transform: "rotate(90deg)" }} />
+            <Button className="startButton" onClick={event => props.changePlanechaseView()}>Start Your Game!</Button>
+        </Container >
+
+    )
+}
+
+export default function Planechase(props) {
+    return (
+        <div>
+            {props.planechaseState.builderVisibility ? <DeckBuilder changePlanechaseView={props.changePlanechaseView} clearPlanechaseDeck={props.clearPlanechaseDeck} planechaseState={props.planechaseState} /> : ''}
+            {props.planechaseState.gameVisibility ? <PlanechaseGame planechaseState={props.planechaseState} changePlanechaseView={props.changePlanechaseView} /> : ''}
+        </div>
     )
 }

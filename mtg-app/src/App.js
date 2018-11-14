@@ -47,8 +47,10 @@ class App extends Component {
 				}
 			},
 			planechaseState: {
-				visibility: "visible",
+				builderVisibility: true,
+				gameVisibility: false,
 				seachDone: false,
+				gameData: [],
 				playDeck: [],
 				planeCards: [],
 				formattedCards: [],
@@ -131,14 +133,14 @@ class App extends Component {
 			axios.get(searchUrl)
 				.then(function (response) {
 					let cardData = response.data.data;
-					cardData.forEach((card, idx) => planechaseState.planeCards.push({ key: idx, name: card.name, image: card.image_uris.png, text: card.oracle_text }))
+					cardData.forEach((card, idx) => planechaseState.planeCards.push({ key: idx, name: card.name, image: card.image_uris.normal, text: card.oracle_text }))
 					planechaseState.planeCards.forEach(card => planechaseState.formattedCards.push(
 						<tr key={card.key}>
 							<th scope="row"><Button onClick={event => {
 								planechaseState.playDeck.push(<li key={card.key}>{card.name}</li>)
+								planechaseState.gameData.push({ key: card.key, name: card.name, image: card.image, text: card.text })
 								self.setState({ planechaseState: planechaseState })
-								console.log(self.state.planechaseState.playDeck)
-							}} ><i class="far fa-check-square"></i></Button></th>
+							}} ><i className="far fa-check-square"></i></Button></th>
 							<td>{card.name}</td>
 							<td>{card.text}</td>
 						</tr>
@@ -163,11 +165,14 @@ class App extends Component {
 	changePlanechaseView(event) {
 		let planechaseState = this.state.planechaseState,
 			self = this;
-		if (planechaseState.visibility === "visible") {
-			planechaseState.visibility = "hidden";
+		if (planechaseState.builderVisibility === true) {
+			planechaseState.builderVisibility = false;
+			planechaseState.gameVisibility = true;
+			console.log(self.state.planechaseState.gameData)
 			self.setState({ planechaseState: planechaseState })
 		} else {
-			planechaseState.visibility = "visible";
+			planechaseState.builderVisibility = true;
+			planechaseState.gameVisibility = false;
 			self.setState({ planechaseState: planechaseState })
 		}
 	}
@@ -206,8 +211,6 @@ class App extends Component {
 		this.setState({ renderStates: renderStates });
 	}
 
-
-
 	render() {
 		let home = <HomePage renderCardSearch={this.renderCardSearch} renderPlanechase={this.renderPlanechase} />,
 			cardSearch = <CardSearch handleSearchChange={this.handleSearchChange} handleFuzzySearch={this.handleFuzzySearch} cardSearchState={this.state.cardSearchState} />,
@@ -222,11 +225,11 @@ class App extends Component {
 					<Button onClick={this.renderHome}>Close!</Button>
 				</header>
 
-				{/* {this.state.renderStates.home ? home : ''}
-				{this.state.renderStates.about ? about : ''}
+				{this.state.renderStates.home ? home : ''}
+				{/* {this.state.renderStates.about ? about : ''} */}
 				{this.state.renderStates.cardSearch ? cardSearch : ''}
-				{this.state.renderStates.planechase ? planechase : ''} */}
-				<BattleCounter battleCounterState={this.state.battleCounterState} />
+				{this.state.renderStates.planechase ? planechase : ''}
+				{/* <BattleCounter battleCounterState={this.state.battleCounterState} /> */}
 			</div>
 		);
 	}
