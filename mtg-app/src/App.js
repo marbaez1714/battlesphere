@@ -4,10 +4,7 @@ import HomePage from './pages/home/home';
 import About from './pages/about/about';
 import BattleCounter from './pages/battle-counter/battle-counter';
 import CardSearch from './pages/card-search/card-search';
-import DeckBuilder from './pages/deck-builder/deck-builder';
 import Planechase from './pages/planechase/planechase';
-import SetLists from './pages/set-lists/set-lists';
-import OopsPage from './pages/oops';
 import axios from 'axios';
 import logo from './logo.svg';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -79,8 +76,7 @@ class App extends Component {
 		let self = this;
 		let searchState = this.state.cardSearchState,
 			fuzzyUrl = 'https://api.scryfall.com/cards/named?fuzzy=',
-			searchUrl = fuzzyUrl + searchState.inputValue.split(' ').join('+'),
-			cardLegal = searchState.legalities;
+			searchUrl = fuzzyUrl + searchState.inputValue.split(' ').join('+')
 		axios.get(searchUrl).then(function (response) {
 			let cardData = response.data;
 			console.log(cardData)
@@ -182,6 +178,12 @@ class App extends Component {
 		renderStates.cardSearch = true;
 		this.setState({ renderStates: renderStates })
 	}
+	renderAbout(event) {
+		let renderStates = this.state.renderStates
+		Object.keys(renderStates).forEach(key => renderStates[key] = false);
+		renderStates.about = true;
+		this.setState({ renderStates: renderStates })
+	}
 
 	renderPlanechase(event) {
 		let renderStates = this.state.renderStates
@@ -220,12 +222,11 @@ class App extends Component {
 					<Button onClick={this.renderHome}>Close!</Button>
 				</header>
 
-				{this.state.renderStates.home ? home : ''}
-
+				{/* {this.state.renderStates.home ? home : ''}
+				{this.state.renderStates.about ? about : ''}
 				{this.state.renderStates.cardSearch ? cardSearch : ''}
-
-				{this.state.renderStates.planechase ? planechase : ''}
-
+				{this.state.renderStates.planechase ? planechase : ''} */}
+				<BattleCounter battleCounterState={this.state.battleCounterState} />
 			</div>
 		);
 	}
