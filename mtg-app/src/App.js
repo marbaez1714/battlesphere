@@ -48,6 +48,14 @@ class App extends Component {
 					duel: "",
 					brawl: ""
 				}
+			},
+			planechaseState: {
+				visibility: "visible",
+				seachDone: false,
+				playDeck: [],
+				planeCards: [],
+				formattedCards: [],
+				cardBack: "https://humpheh.com/magic/p/res/W500/Planechase%20Back-W500.jpg"
 			}
 		}
 
@@ -55,7 +63,10 @@ class App extends Component {
 		this.handleFuzzySearch = this.handleFuzzySearch.bind(this);
 		this.renderCardSearch = this.renderCardSearch.bind(this);
 		this.renderPlanechase = this.renderPlanechase.bind(this);
+		this.getAllPlaneCards = this.getAllPlaneCards.bind(this);
 		this.renderHome = this.renderHome.bind(this);
+		this.clearPlanechaseDeck = this.clearPlanechaseDeck.bind(this);
+		this.changePlanechaseView = this.changePlanechaseView.bind(this);
 	}
 
 	handleSearchChange(event) {
@@ -115,6 +126,56 @@ class App extends Component {
 		event.preventDefault();
 	}
 
+	getAllPlaneCards(event) {
+		let searchUrl = "https://api.scryfall.com/cards/search?q=t:plane",
+			planechaseState = this.state.planechaseState,
+			self = this;
+
+		if (planechaseState.seachDone === false) {
+			axios.get(searchUrl)
+				.then(function (response) {
+					let cardData = response.data.data;
+					cardData.forEach((card, idx) => planechaseState.planeCards.push({ key: idx, name: card.name, image: card.image_uris.png, text: card.oracle_text }))
+					planechaseState.planeCards.forEach(card => planechaseState.formattedCards.push(
+						<tr key={card.key}>
+							<th scope="row"><Button onClick={event => {
+								planechaseState.playDeck.push(<li key={card.key}>{card.name}</li>)
+								self.setState({ planechaseState: planechaseState })
+								console.log(self.state.planechaseState.playDeck)
+							}} ><i class="far fa-check-square"></i></Button></th>
+							<td>{card.name}</td>
+							<td>{card.text}</td>
+						</tr>
+					))
+					planechaseState.seachDone = true;
+					self.setState({ planechaseState: planechaseState })
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+		}
+	}
+
+	clearPlanechaseDeck(event) {
+		if (this.state.planechaseState.playDeck.length > 0) {
+			let playState = this.state.planechaseState;
+			playState.playDeck = [];
+			this.setState({ planechaseState: playState })
+		}
+	}
+
+	changePlanechaseView(event) {
+		let planechaseState = this.state.planechaseState,
+			self = this;
+		if (planechaseState.visibility === "visible") {
+			planechaseState.visibility = "hidden";
+			self.setState({ planechaseState: planechaseState })
+		} else {
+			planechaseState.visibility = "visible";
+			self.setState({ planechaseState: planechaseState })
+		}
+	}
+
 	renderCardSearch(event) {
 		let renderStates = this.state.renderStates
 		Object.keys(renderStates).forEach(key => renderStates[key] = false);
@@ -146,11 +207,10 @@ class App extends Component {
 
 
 	render() {
-		let home = <HomePage renderCardSearch={this.renderCardSearch}
-			renderPlanechase={this.renderPlanechase} />,
+		let home = <HomePage renderCardSearch={this.renderCardSearch} renderPlanechase={this.renderPlanechase} />,
 			cardSearch = <CardSearch handleSearchChange={this.handleSearchChange} handleFuzzySearch={this.handleFuzzySearch} cardSearchState={this.state.cardSearchState} />,
-			planechase = <Planechase />
-
+			planechase = <Planechase planechaseState={this.state.planechaseState} clearPlanechaseDeck={this.clearPlanechaseDeck} changePlanechaseView={this.changePlanechaseView} />
+		this.getAllPlaneCards();
 
 
 		return (

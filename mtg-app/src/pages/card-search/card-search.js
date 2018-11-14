@@ -25,7 +25,7 @@ function CardLegal(props) {
     }
     return (
         <div>
-            <CardBody>
+            <CardBody className="searchCardBody">
                 <CardSubtitle>Card Legalities:</CardSubtitle>
 
             </CardBody >
@@ -67,12 +67,12 @@ function CardData(props) {
                 <img className="cardImage" src={cardData.cardUri} alt="CardImage" />
             </Col>
             <Col md="5" className="cardInformation" >
-                <Card className="cardData">
+                <Card className="cardData searchCard">
                     <CardHeader>{cardData.cardName}</CardHeader>
-                    <CardBody>
+                    <CardBody className="searchCardBody">
                         <CardSubtitle>Average Price: {cardData.cardPrice}</CardSubtitle>
                     </CardBody>
-                    <CardBody>
+                    <CardBody className="searchCardBody">
                         <CardSubtitle>Card Type: {cardData.cardType}</CardSubtitle>
                     </CardBody>
 
