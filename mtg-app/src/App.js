@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
-import { Button } from 'reactstrap';
+import { Col, Button } from 'reactstrap';
 import HomePage from './pages/home/home';
-import About from './pages/about/about';
-import BattleCounter from './pages/battle-counter/battle-counter';
 import CardSearch from './pages/card-search/card-search';
 import Planechase from './pages/planechase/planechase';
 import axios from 'axios';
-import logo from './logo.svg';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -47,33 +44,31 @@ class App extends Component {
 				}
 			},
 			planechaseState: {
-				builderVisibility: true,
-				gameVisibility: false,
-				seachDone: false,
-				gameData: [],
-				playDeck: [],
-				planeCards: [],
-				formattedCards: [],
-				cardBack: "https://humpheh.com/magic/p/res/W500/Planechase%20Back-W500.jpg"
+				urlForSearch: "https://api.scryfall.com/cards/search?q=t=plane",
+				planeCardBack: "https://humpheh.com/magic/p/res/W500/Planechase%20Back-W500.jpg",
+				planechaseCards: [],
+				planechaseCardImage: [],
+				gameDeck: [],
 			}
 		}
-
+		// Functions for the card search
 		this.handleSearchChange = this.handleSearchChange.bind(this);
 		this.handleFuzzySearch = this.handleFuzzySearch.bind(this);
+		// Functions for Planechase
+		this.displayAllCards = this.displayAllCards.bind(this);
+		// Render functions for each app
+		this.renderHome = this.renderHome.bind(this);
 		this.renderCardSearch = this.renderCardSearch.bind(this);
 		this.renderPlanechase = this.renderPlanechase.bind(this);
-		this.getAllPlaneCards = this.getAllPlaneCards.bind(this);
-		this.renderHome = this.renderHome.bind(this);
-		this.clearPlanechaseDeck = this.clearPlanechaseDeck.bind(this);
-		this.changePlanechaseView = this.changePlanechaseView.bind(this);
 	}
 
+
+	// Functions for the card search
 	handleSearchChange(event) {
 		let newValue = this.state.cardSearchState;
 		newValue.inputValue = event.target.value;
 		this.setState({ cardSearchState: newValue });
 	}
-
 	handleFuzzySearch(event) {
 		let self = this;
 		let searchState = this.state.cardSearchState,
@@ -123,66 +118,42 @@ class App extends Component {
 		console.log(searchUrl)
 		event.preventDefault();
 	}
-
+	// Functions for Planechase
 	getAllPlaneCards(event) {
-		let searchUrl = "https://api.scryfall.com/cards/search?q=t:plane",
-			planechaseState = this.state.planechaseState,
+		let planechaseState = this.state.planechaseState,
 			self = this;
-
-		if (planechaseState.seachDone === false) {
-			axios.get(searchUrl)
+		if (planechaseState.planechaseCards.length <= 0) {
+			axios.get(planechaseState.urlForSearch)
 				.then(function (response) {
-					let cardData = response.data.data;
-					cardData.forEach((card, idx) => planechaseState.planeCards.push({ key: idx, name: card.name, image: card.image_uris.normal, text: card.oracle_text }))
-					planechaseState.planeCards.forEach(card => planechaseState.formattedCards.push(
-						<tr key={card.key}>
-							<th scope="row"><Button onClick={event => {
-								planechaseState.playDeck.push(<li key={card.key}>{card.name}</li>)
-								planechaseState.gameData.push({ key: card.key, name: card.name, image: card.image, text: card.text })
-								self.setState({ planechaseState: planechaseState })
-							}} ><i className="far fa-check-square"></i></Button></th>
-							<td>{card.name}</td>
-							<td>{card.text}</td>
-						</tr>
-					))
-					planechaseState.seachDone = true;
+					let allPlanesData = response.data.data;
+					allPlanesData.forEach((card, idx) => planechaseState.planechaseCards.push({ key: idx, name: card.name, image: card.image_uris.normal, text: card.oracle_text }))
+					console.log(planechaseState.planechaseCards);
 					self.setState({ planechaseState: planechaseState })
 				})
 				.catch(function (error) {
-					console.log(error);
-				});
+					console.log("Opps! Something went wront!: ", error);
+				})
 		}
 	}
-
-	clearPlanechaseDeck(event) {
-		if (this.state.planechaseState.playDeck.length > 0) {
-			let playState = this.state.planechaseState;
-			playState.playDeck = [];
-			this.setState({ planechaseState: playState })
-		}
-	}
-
-	changePlanechaseView(event) {
+	displayAllCards(event) {
 		let planechaseState = this.state.planechaseState,
 			self = this;
-		if (planechaseState.builderVisibility === true) {
-			planechaseState.builderVisibility = false;
-			planechaseState.gameVisibility = true;
-			console.log(self.state.planechaseState.gameData)
-			self.setState({ planechaseState: planechaseState })
-		} else {
-			planechaseState.builderVisibility = true;
-			planechaseState.gameVisibility = false;
-			self.setState({ planechaseState: planechaseState })
-		}
+		planechaseState.planechaseCards.forEach((card, idx) => {
+			planechaseState.planechaseCardImage.push(<Col md="6"><img key={idx} src={card.image} alt={card.name} className="planeCard" /></Col>)
+		})
+		return (planechaseState.planechaseCardImage)
 	}
 
+
+
+	// Render functions for each app
 	renderCardSearch(event) {
 		let renderStates = this.state.renderStates
 		Object.keys(renderStates).forEach(key => renderStates[key] = false);
 		renderStates.cardSearch = true;
 		this.setState({ renderStates: renderStates })
 	}
+
 	renderAbout(event) {
 		let renderStates = this.state.renderStates
 		Object.keys(renderStates).forEach(key => renderStates[key] = false);
@@ -214,10 +185,8 @@ class App extends Component {
 	render() {
 		let home = <HomePage renderCardSearch={this.renderCardSearch} renderPlanechase={this.renderPlanechase} />,
 			cardSearch = <CardSearch handleSearchChange={this.handleSearchChange} handleFuzzySearch={this.handleFuzzySearch} cardSearchState={this.state.cardSearchState} />,
-			planechase = <Planechase planechaseState={this.state.planechaseState} clearPlanechaseDeck={this.clearPlanechaseDeck} changePlanechaseView={this.changePlanechaseView} />
-		this.getAllPlaneCards();
-
-
+			planechase = <Planechase displayAllCards={this.displayAllCards} />
+		this.getAllPlaneCards()
 		return (
 			<div className="App" >
 				<header className="App-header">
