@@ -21,7 +21,7 @@ function PlayDeck(props) {
                     <Row className="selectedCards" >
                         {props.planechaseState.playDeck.map(
                             (card, idx) =>
-                                <Col md='6' key={idx}>
+                                <Col md='4' key={idx}>
                                     <p>
                                         <i onClick={event => props.removeCard(idx)} className="fas fa-times"></i>
                                         {"    " + card.name}

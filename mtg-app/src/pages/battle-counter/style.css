@@ -1,0 +1,16 @@
+.battleCounterContainer{
+    margin-top:1vmax !important;
+}
+
+.addPlayerButton{
+    margin-bottom:1vmax;
+    width:100%
+}
+
+.counterContainer{
+    margin-top:1vmax;
+}
+
+.playerCard{
+    margin-bottom:1vmax;
+}

@@ -31,6 +31,7 @@
 
 .selectedCards{
     max-height: 20vmax;
+    min-height: 20vmax;
     overflow: scroll;
     overflow-x: hidden ;
 }

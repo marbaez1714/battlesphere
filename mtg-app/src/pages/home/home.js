@@ -44,7 +44,7 @@ export default function HomePage(props) {
                     </Button>
                 </Col>
                 <Col md="4" className="cards">
-                    <Button id="menuCard">
+                    <Button id="menuCard" onClick={props.renderBattleCounter}>
                         <CardImg top width="100%" src={imageBattleCounter} />
                         <p className="cardTitle"> Battle Counter - WIP</p>
                     </Button>

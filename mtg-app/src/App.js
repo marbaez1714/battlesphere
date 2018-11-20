@@ -3,6 +3,7 @@ import { Button } from 'reactstrap';
 import HomePage from './pages/home/home';
 import CardSearch from './pages/card-search/card-search';
 import Planechase from './pages/planechase/planechase';
+import BattleCounter from './pages/battle-counter/battle-counter'
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
@@ -49,11 +50,16 @@ class App extends Component {
 				planechaseCards: [],
 				playDeck: [],
 				playCounter: 1,
+			},
+			battleCounterState: {
+				numberOfPlayers: 0,
+				players: []
 			}
 		}
 		// Functions for the card search
 		this.handleSearchChange = this.handleSearchChange.bind(this);
 		this.handleFuzzySearch = this.handleFuzzySearch.bind(this);
+
 		// Functions for Planechase
 		this.addAll = this.addAll.bind(this);
 		this.addCard = this.addCard.bind(this);
@@ -63,12 +69,17 @@ class App extends Component {
 		this.removeCard = this.removeCard.bind(this);
 		this.restartGame = this.restartGame.bind(this);
 
+		// Functions for Battle Counter 
+		this.addPlayer = this.addPlayer.bind(this);
+		this.removePlayer = this.removePlayer.bind(this);
+		this.removeAllPlayers = this.removeAllPlayers.bind(this);
+
 		// Render functions for each app
 		this.renderHome = this.renderHome.bind(this);
 		this.renderCardSearch = this.renderCardSearch.bind(this);
 		this.renderPlanechase = this.renderPlanechase.bind(this);
+		this.renderBattleCounter = this.renderBattleCounter.bind(this);
 	}
-
 
 	// Functions for the card search
 	handleSearchChange(event) {
@@ -201,6 +212,32 @@ class App extends Component {
 
 	}
 
+	// Functions for Battle Counter
+
+	addPlayer(event) {
+		let battleCounterState = this.state.battleCounterState;
+		battleCounterState.players.push([battleCounterState.numberOfPlayers, 20])
+		battleCounterState.numberOfPlayers++;
+		this.setState({ battleCounterState: battleCounterState })
+	}
+
+	removeAllPlayers(event) {
+		let battleCounterState = this.state.battleCounterState;
+		battleCounterState.players = [];
+		battleCounterState.numberOfPlayers = 0;
+		this.setState({ battleCounterState: battleCounterState })
+
+	}
+
+	removePlayer(index) {
+		let battleCounterState = this.state.battleCounterState;
+		battleCounterState.players.splice(index, 1)
+		battleCounterState.numberOfPlayers--;
+		this.setState({ battleCounterState: battleCounterState })
+
+
+	}
+
 	// Render functions for each app
 	renderCardSearch(event) {
 		let renderStates = this.state.renderStates
@@ -208,28 +245,30 @@ class App extends Component {
 		renderStates.cardSearch = true;
 		this.setState({ renderStates: renderStates })
 	}
-
 	renderAbout(event) {
 		let renderStates = this.state.renderStates
 		Object.keys(renderStates).forEach(key => renderStates[key] = false);
 		renderStates.about = true;
 		this.setState({ renderStates: renderStates })
 	}
-
 	renderPlanechase(event) {
 		let renderStates = this.state.renderStates
 		Object.keys(renderStates).forEach(key => renderStates[key] = false);
 		renderStates.planechase = true;
 		this.setState({ renderStates: renderStates });
 	}
-
 	renderDeckBuilder(event) {
 		let renderStates = this.state.renderStates
 		Object.keys(renderStates).forEach(key => renderStates[key] = false);
 		renderStates.deckBuilder = true;
 		this.setState({ renderStates: renderStates });
 	}
-
+	renderBattleCounter(event) {
+		let renderStates = this.state.renderStates
+		Object.keys(renderStates).forEach(key => renderStates[key] = false);
+		renderStates.battleCounter = true;
+		this.setState({ renderStates: renderStates });
+	}
 	renderHome(event) {
 		let renderStates = this.state.renderStates
 		Object.keys(renderStates).forEach(key => renderStates[key] = false);
@@ -237,10 +276,12 @@ class App extends Component {
 		this.setState({ renderStates: renderStates });
 	}
 
+
 	render() {
-		let home = <HomePage renderCardSearch={this.renderCardSearch} renderPlanechase={this.renderPlanechase} />,
+		let home = <HomePage renderCardSearch={this.renderCardSearch} renderPlanechase={this.renderPlanechase} renderBattleCounter={this.renderBattleCounter} />,
 			cardSearch = <CardSearch handleSearchChange={this.handleSearchChange} handleFuzzySearch={this.handleFuzzySearch} cardSearchState={this.state.cardSearchState} />,
-			planechase = <Planechase planechaseState={this.state.planechaseState} startGame={this.startGame} restartGame={this.restartGame} nextCard={this.nextCard} addCard={this.addCard} addAll={this.addAll} removeCard={this.removeCard} clearAll={this.clearAll} />
+			planechase = <Planechase planechaseState={this.state.planechaseState} startGame={this.startGame} restartGame={this.restartGame} nextCard={this.nextCard} addCard={this.addCard} addAll={this.addAll} removeCard={this.removeCard} clearAll={this.clearAll} />,
+			battleCounter = <BattleCounter battleCounterState={this.state.battleCounterState} addPlayer={this.addPlayer} removePlayer={this.removePlayer} removeAllPlayers={this.removeAllPlayers} />
 		this.getAllPlaneCards()
 		return (
 			<div className="App" >
@@ -253,7 +294,8 @@ class App extends Component {
 				{/* {this.state.renderStates.about ? about : ''} */}
 				{this.state.renderStates.cardSearch ? cardSearch : ''}
 				{this.state.renderStates.planechase ? planechase : ''}
-				{/* <BattleCounter battleCounterState={this.state.battleCounterState} /> */}
+				{this.state.renderStates.battleCounter ? battleCounter : ''}
+
 			</div>
 		);
 	}
