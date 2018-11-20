@@ -41,6 +41,7 @@
 
 .currentPlaneCardContainer{
     animation:slide-in-left .5s cubic-bezier(.25,.46,.45,.94) both;
+    cursor: pointer;
 
 }
 

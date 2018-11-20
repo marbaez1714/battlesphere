@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Col, Card, CardBody, CardTitle, CardImg, CardText, Row, Button } from 'reactstrap'
+import { Container, Col, Card, CardBody, CardTitle, CardText, Row, Button } from 'reactstrap'
 import './style.css'
 
 function PlayDeck(props) {
@@ -21,9 +21,9 @@ function PlayDeck(props) {
                     <Row className="selectedCards" >
                         {props.planechaseState.playDeck.map(
                             (card, idx) =>
-                                <Col md='6' >
-                                    <p key={idx}>
-                                        <i onClick={event => props.removeCard(idx)} class="fas fa-times"></i>
+                                <Col md='6' key={idx}>
+                                    <p>
+                                        <i onClick={event => props.removeCard(idx)} className="fas fa-times"></i>
                                         {"    " + card.name}
                                     </p>
                                 </Col>
@@ -47,7 +47,7 @@ function AllCards(props) {
                 <Col md="4" key={idx} className="cardContainer">
                     <Card className="planeCardContainer" onClick={event => props.addCard(card)}>
                         <CardBody>
-                            <img className="planeCardImage" src={card.image} />
+                            <img className="planeCardImage" src={card.image} alt={card.name} />
                         </CardBody>
                     </Card>
                 </Col>
@@ -70,13 +70,12 @@ function PlanchaseGame(props) {
     return (
         <Row>
             <Col md='12' className="currentPlaneCardContainer" onClick={event => props.nextCard()}>
-                <p>{props.planechaseState.playCounter}/{props.planechaseState.playDeck.length}</p>
-                <img className="currentPlaneCard" src={props.planechaseState.playDeck[0].image} />
+                <img className="currentPlaneCard" src={props.planechaseState.playDeck[0].image} alt={props.planechaseState.playDeck[0].name} />
             </Col>
             <Col md='12'>
-                <Button className='goBackButton' onClick={event => props.restartGame()} >Remake Your Deck</Button>
+                <Button className='goBackButton' onClick={event => props.restartGame()} >Rebuild Your Deck</Button>
             </Col>
-        </Row>
+        </Row >
     )
 }
 

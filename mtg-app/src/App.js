@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Col, Button } from 'reactstrap';
+import { Button } from 'reactstrap';
 import HomePage from './pages/home/home';
 import CardSearch from './pages/card-search/card-search';
 import Planechase from './pages/planechase/planechase';
