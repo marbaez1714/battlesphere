@@ -4,7 +4,10 @@
 
 .addPlayerButton{
     margin-bottom:1vmax;
-    width:100%
+    width:100%;
+    font-size: 1.25rem !important;
+    font-weight: 500 !important;
+    line-height: 1.2 !important;
 }
 
 .counterContainer{
@@ -14,3 +17,4 @@
 .playerCard{
     margin-bottom:1vmax;
 }
+

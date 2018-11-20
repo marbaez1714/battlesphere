@@ -12,9 +12,9 @@ function PlayDeck(props) {
 
                     {/* Buttons to 'Add All' , 'Start Game' , and 'Clear Deck' */}
                     <Row>
-                        <Col md='4'><Button onClick={event => props.clearAll()} style={{ marginBottom: '1vmax', width: '100%' }}>Clear Deck</Button></Col>
-                        <Col md='4'><Button onClick={event => props.addAll()} style={{ marginBottom: '1vmax', width: '100%' }}>Add All</Button></Col>
-                        <Col md='4'><Button onClick={event => props.startGame()} style={{ marginBottom: '1vmax', width: '100%' }}>Start!</Button></Col>
+                        <Col md='12'><Button className="planechaseButton" onClick={event => props.startGame()} color="success">Start!</Button></Col>
+                        <Col md='6'><Button className="planechaseButton" onClick={event => props.addAll()} >Add All</Button></Col>
+                        <Col md='6'><Button className="planechaseButton" onClick={event => props.clearAll()} >Clear Deck</Button></Col>
                     </Row>
 
                     {/* Creates list of all Planechase cards that can be used with buttons to remove*/}

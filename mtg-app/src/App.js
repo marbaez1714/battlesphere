@@ -72,6 +72,7 @@ class App extends Component {
 		// Functions for Battle Counter 
 		this.addPlayer = this.addPlayer.bind(this);
 		this.removePlayer = this.removePlayer.bind(this);
+		this.increaseNumber = this.increaseNumber.bind(this);
 		this.removeAllPlayers = this.removeAllPlayers.bind(this);
 
 		// Render functions for each app
@@ -213,14 +214,12 @@ class App extends Component {
 	}
 
 	// Functions for Battle Counter
-
 	addPlayer(event) {
 		let battleCounterState = this.state.battleCounterState;
 		battleCounterState.players.push([battleCounterState.numberOfPlayers, 20])
 		battleCounterState.numberOfPlayers++;
 		this.setState({ battleCounterState: battleCounterState })
 	}
-
 	removeAllPlayers(event) {
 		let battleCounterState = this.state.battleCounterState;
 		battleCounterState.players = [];
@@ -228,11 +227,16 @@ class App extends Component {
 		this.setState({ battleCounterState: battleCounterState })
 
 	}
-
 	removePlayer(index) {
 		let battleCounterState = this.state.battleCounterState;
 		battleCounterState.players.splice(index, 1)
 		battleCounterState.numberOfPlayers--;
+		this.setState({ battleCounterState: battleCounterState })
+	}
+	increaseNumber(player, index) {
+		let battleCounterState = this.state.battleCounterState;
+		battleCounterState.players[player][index]++
+		console.log(battleCounterState.players[player][index])
 		this.setState({ battleCounterState: battleCounterState })
 
 
@@ -281,7 +285,7 @@ class App extends Component {
 		let home = <HomePage renderCardSearch={this.renderCardSearch} renderPlanechase={this.renderPlanechase} renderBattleCounter={this.renderBattleCounter} />,
 			cardSearch = <CardSearch handleSearchChange={this.handleSearchChange} handleFuzzySearch={this.handleFuzzySearch} cardSearchState={this.state.cardSearchState} />,
 			planechase = <Planechase planechaseState={this.state.planechaseState} startGame={this.startGame} restartGame={this.restartGame} nextCard={this.nextCard} addCard={this.addCard} addAll={this.addAll} removeCard={this.removeCard} clearAll={this.clearAll} />,
-			battleCounter = <BattleCounter battleCounterState={this.state.battleCounterState} addPlayer={this.addPlayer} removePlayer={this.removePlayer} removeAllPlayers={this.removeAllPlayers} />
+			battleCounter = <BattleCounter battleCounterState={this.state.battleCounterState} addPlayer={this.addPlayer} removePlayer={this.removePlayer} removeAllPlayers={this.removeAllPlayers} increaseNumber={this.increaseNumber} />
 		this.getAllPlaneCards()
 		return (
 			<div className="App" >
