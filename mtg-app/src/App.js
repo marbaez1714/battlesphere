@@ -44,18 +44,25 @@ class App extends Component {
 				}
 			},
 			planechaseState: {
+				gameStart: false,
 				urlForSearch: "https://api.scryfall.com/cards/search?q=t=plane",
-				planeCardBack: "https://humpheh.com/magic/p/res/W500/Planechase%20Back-W500.jpg",
 				planechaseCards: [],
-				planechaseCardImage: [],
-				gameDeck: [],
+				playDeck: [],
+				playCounter: 1,
 			}
 		}
 		// Functions for the card search
 		this.handleSearchChange = this.handleSearchChange.bind(this);
 		this.handleFuzzySearch = this.handleFuzzySearch.bind(this);
 		// Functions for Planechase
-		this.displayAllCards = this.displayAllCards.bind(this);
+		this.addAll = this.addAll.bind(this);
+		this.addCard = this.addCard.bind(this);
+		this.clearAll = this.clearAll.bind(this);
+		this.nextCard = this.nextCard.bind(this);
+		this.startGame = this.startGame.bind(this);
+		this.removeCard = this.removeCard.bind(this);
+		this.restartGame = this.restartGame.bind(this);
+
 		// Render functions for each app
 		this.renderHome = this.renderHome.bind(this);
 		this.renderCardSearch = this.renderCardSearch.bind(this);
@@ -135,16 +142,64 @@ class App extends Component {
 				})
 		}
 	}
-	displayAllCards(event) {
-		let planechaseState = this.state.planechaseState,
-			self = this;
-		planechaseState.planechaseCards.forEach((card, idx) => {
-			planechaseState.planechaseCardImage.push(<Col md="6"><img key={idx} src={card.image} alt={card.name} className="planeCard" /></Col>)
-		})
-		return (planechaseState.planechaseCardImage)
+	addCard(card) {
+		let planechaseState = this.state.planechaseState;
+		planechaseState.playDeck.push(card)
+		this.setState({ planechaseState: planechaseState })
+		console.log(this.state.planechaseState.playDeck)
 	}
+	addAll(card) {
+		let planechaseState = this.state.planechaseState;
+		planechaseState.planechaseCards.forEach(card => planechaseState.playDeck.push(card));
+		this.setState({ planechaseState: planechaseState })
+		console.log(this.state.planechaseState.playDeck)
+	}
+	removeCard(index) {
+		let planechaseState = this.state.planechaseState;
+		planechaseState.playDeck.splice(index, 1)
+		this.setState({ planechaseState: planechaseState })
+		console.log(this.state.planechaseState.playDeck)
+	}
+	clearAll(event) {
+		let planechaseState = this.state.planechaseState;
+		planechaseState.playDeck = [];
+		this.setState({ planechaseState: planechaseState })
+		console.log(this.state.planechaseState.playDeck)
+	}
+	shuffle(deck) {
+		for (let i = deck.length - 1; i > 0; i--) {
+			let j = Math.floor(Math.random() * (i + 1));
+			[deck[i], deck[j]] = [deck[j], deck[i]];
+		}
+		return deck
+	}
+	startGame(event) {
+		let planechaseState = this.state.planechaseState;
 
+		if (planechaseState.playDeck.length > 0) {
+			planechaseState.gameStart = true;
+			this.shuffle(planechaseState.playDeck)
+			this.setState({ planechaseState: planechaseState })
+		} else {
+			alert('You need to make a deck first!')
+		}
+	}
+	restartGame(event) {
+		let planechaseState = this.state.planechaseState;
+		planechaseState.gameStart = false;
+		this.setState({ planechaseState: planechaseState })
+	}
+	nextCard(event) {
+		let planechaseState = this.state.planechaseState;
+		planechaseState.playDeck.push(planechaseState.playDeck.shift());
+		planechaseState.playCounter++;
+		if (planechaseState.playCounter > planechaseState.playDeck.length) {
+			this.shuffle(planechaseState.playDeck);
+			planechaseState.playCounter = 1;
+		}
+		this.setState({ planechaseState: planechaseState })
 
+	}
 
 	// Render functions for each app
 	renderCardSearch(event) {
@@ -185,7 +240,7 @@ class App extends Component {
 	render() {
 		let home = <HomePage renderCardSearch={this.renderCardSearch} renderPlanechase={this.renderPlanechase} />,
 			cardSearch = <CardSearch handleSearchChange={this.handleSearchChange} handleFuzzySearch={this.handleFuzzySearch} cardSearchState={this.state.cardSearchState} />,
-			planechase = <Planechase displayAllCards={this.displayAllCards} />
+			planechase = <Planechase planechaseState={this.state.planechaseState} startGame={this.startGame} restartGame={this.restartGame} nextCard={this.nextCard} addCard={this.addCard} addAll={this.addAll} removeCard={this.removeCard} clearAll={this.clearAll} />
 		this.getAllPlaneCards()
 		return (
 			<div className="App" >
