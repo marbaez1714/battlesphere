@@ -2,22 +2,6 @@
     margin-top : 1vmax;
 }
 
-.cardBody { 
-    padding:0px !important;
-    background-color: #6c757d;
-}
-
-#cardButton {
-    width:100%;
-    padding: 1.5rem ;
-    font-size: 1.25rem ;
-    font-weight: 500 ;
-    line-height: 1.2 ;
-    color: white ;
-    background-color:transparent ;
-    border-style: none ;
-}
-
 #menuCard {
     padding:0;
 }

@@ -16,13 +16,13 @@ export default function HomePage(props) {
                 <Col md="4" className="cards">
                     <Button id="menuCard" onClick={props.renderAbout}>
                         <CardImg top width="100%" src={imageAbout} />
-                        <p className="cardTitle"> About Battlesphere </p>
+                        <p className="cardTitle"> About Battlesphere - WIP</p>
                     </Button>
                 </Col>
                 <Col md="4" className="cards">
                     <Button id="menuCard">
                         <CardImg top width="100%" src={imageDeckBuilder} />
-                        <p className="cardTitle"> Deck Builder </p>
+                        <p className="cardTitle"> Deck Builder - WIP</p>
                     </Button>
                 </Col>
                 <Col md="4" className="cards">
@@ -34,7 +34,7 @@ export default function HomePage(props) {
                 <Col md="4" className="cards">
                     <Button id="menuCard">
                         <CardImg top width="100%" src={imageSetLists} />
-                        <p className="cardTitle"> Set Lists </p>
+                        <p className="cardTitle"> Set Lists - WIP</p>
                     </Button>
                 </Col>
                 <Col md="4" className="cards">
@@ -46,7 +46,7 @@ export default function HomePage(props) {
                 <Col md="4" className="cards">
                     <Button id="menuCard">
                         <CardImg top width="100%" src={imageBattleCounter} />
-                        <p className="cardTitle"> Battle Counter </p>
+                        <p className="cardTitle"> Battle Counter - WIP</p>
                     </Button>
                 </Col>
             </Row>

@@ -1,58 +1,92 @@
 import React from 'react';
-import { Button, Card, CardHeader, CardSubtitle, CardBody, Container, Col, Row, Table } from 'reactstrap';
+import { Container, Col, Card, CardBody, CardTitle, CardText, Row, Button } from 'reactstrap'
 import './style.css'
 
-function DeckBuilder(props) {
+function PlayDeck(props) {
     return (
-        <Container>
-            <Row className="cardBackContainer">
-                <Col md="6" className="imageContainer">
-                    <img style={{ width: "95%" }} src={props.planechaseState.cardBack} alt='' />
-                </Col>
-                <Col md="6" className="yourDeck">
-                    <Card className="deckCard" style={{ height: "100%" }}>
-                        <CardHeader tag="h3">Your Planechase Deck:</CardHeader>
-                        <CardBody>
-                            <CardSubtitle>Number of cards: {props.planechaseState.playDeck.length}</CardSubtitle>
-                            <ul>
-                                {props.planechaseState.playDeck}
-                            </ul>
-                            <Button onClick={event => props.clearPlanechaseDeck()}>Clear</Button>
-                        </CardBody>
-                    </Card>
-                </Col>
-            </Row>
-            <Row>
-                <Col md="12" className="startContainer">
-                    <Button className="startButton" onClick={event => props.changePlanechaseView()}>Start Your Game!</Button>
-                </Col>
-            </Row>
+        <Col md={{ size: 8, offset: 2 }} >
+            <Card className='playDeck'>
+                <CardBody>
+                    <CardTitle>Your Planechase Deck</CardTitle>
+                    <CardText>These cards will be shuffled and will act as your Planechase deck.</CardText>
 
-            <Table striped className="planeCards">
-                <tbody>
-                    {props.planechaseState.formattedCards}
-                </tbody>
-            </Table>
-        </Container >
+                    {/* Buttons to 'Add All' , 'Start Game' , and 'Clear Deck' */}
+                    <Row>
+                        <Col md='4'><Button onClick={event => props.clearAll()} style={{ marginBottom: '1vmax', width: '100%' }}>Clear Deck</Button></Col>
+                        <Col md='4'><Button onClick={event => props.addAll()} style={{ marginBottom: '1vmax', width: '100%' }}>Add All</Button></Col>
+                        <Col md='4'><Button onClick={event => props.startGame()} style={{ marginBottom: '1vmax', width: '100%' }}>Start!</Button></Col>
+                    </Row>
+
+                    {/* Creates list of all Planechase cards that can be used with buttons to remove*/}
+                    <Row className="selectedCards" >
+                        {props.planechaseState.playDeck.map(
+                            (card, idx) =>
+                                <Col md='6' key={idx}>
+                                    <p>
+                                        <i onClick={event => props.removeCard(idx)} className="fas fa-times"></i>
+                                        {"    " + card.name}
+                                    </p>
+                                </Col>
+
+                        )}
+                    </Row>
+
+
+
+                </CardBody>
+            </Card>
+        </Col>
     )
 }
 
-function PlanechaseGame(props) {
+function AllCards(props) {
     return (
-        <Container>
-            <h1 >heheheehehe</h1>
-            <img src={props.planechaseState.gameData[0].image} style={{ transform: "rotate(90deg)" }} />
-            <Button className="startButton" onClick={event => props.changePlanechaseView()}>Start Your Game!</Button>
-        </Container >
 
+        props.planechaseState.planechaseCards.map(
+            (card, idx) =>
+                <Col md="4" key={idx} className="cardContainer">
+                    <Card className="planeCardContainer" onClick={event => props.addCard(card)}>
+                        <CardBody>
+                            <img className="planeCardImage" src={card.image} alt={card.name} />
+                        </CardBody>
+                    </Card>
+                </Col>
+        )
+
+
+    )
+}
+
+function PickCards(props) {
+    return (
+        <Row>
+            <PlayDeck planechaseState={props.planechaseState} addAll={props.addAll} removeCard={props.removeCard} clearAll={props.clearAll} startGame={props.startGame} />
+            <AllCards planechaseState={props.planechaseState} addCard={props.addCard} />
+        </Row>
+    )
+}
+
+function PlanchaseGame(props) {
+    return (
+        <Row>
+            <Col md='12' className="currentPlaneCardContainer" onClick={event => props.nextCard()}>
+                <img className="currentPlaneCard" src={props.planechaseState.playDeck[0].image} alt={props.planechaseState.playDeck[0].name} />
+            </Col>
+            <Col md='12'>
+                <Button className='goBackButton' onClick={event => props.restartGame()} >Rebuild Your Deck</Button>
+            </Col>
+        </Row >
     )
 }
 
 export default function Planechase(props) {
     return (
-        <div>
-            {props.planechaseState.builderVisibility ? <DeckBuilder changePlanechaseView={props.changePlanechaseView} clearPlanechaseDeck={props.clearPlanechaseDeck} planechaseState={props.planechaseState} /> : ''}
-            {props.planechaseState.gameVisibility ? <PlanechaseGame planechaseState={props.planechaseState} changePlanechaseView={props.changePlanechaseView} /> : ''}
-        </div>
+        <Container className='planechaseContainer'>
+            {props.planechaseState.gameStart ?
+                <PlanchaseGame planechaseState={props.planechaseState} restartGame={props.restartGame} nextCard={props.nextCard} /> :
+                <PickCards planechaseState={props.planechaseState} addCard={props.addCard} addAll={props.addAll} removeCard={props.removeCard} clearAll={props.clearAll} startGame={props.startGame} />
+            }
+
+        </Container>
     )
 }
