@@ -1,34 +1,48 @@
 import React from 'react';
-import { Container, Col, Row, Card, CardHeader, CardBody, CardSubtitle, Button } from 'reactstrap';
+import { Button, Container, Col, Row, Card, CardBody, CardHeader, CardFooter, CardSubtitle } from 'reactstrap';
+import './style.css'
 
-function PlayerCounter(props) {
+function PlayerCard(props) {
     return (
-        <Col md="3">
+        <Col md='4' className="playerCard">
             <Card>
-                <CardHeader tag="h3">{props.player.name}</CardHeader>
+                <CardHeader tag="h3">{props.playerInfo[0]}</CardHeader>
                 <CardBody>
-                    <CardSubtitle>{props.player.counters[0]}</CardSubtitle>
+                    <CardSubtitle>
+                        <Button onClick={event => props.increaseNumber(parseInt(props.playerInfo[0]), 1)}><i className="fas fa-plus " style={{ color: "white" }} /></Button>
+                        {props.playerInfo[1]}
+                        <Button><i className="fas fa-minus" style={{ color: "white" }} /></Button>
+                    </CardSubtitle>
+
                 </CardBody>
-                <CardBody>
-                    <Button>Go somewhere</Button>
-                </CardBody>
+                <CardFooter><Button onClick={event => props.removePlayer(props.index)}>Remove</Button></CardFooter>
+
             </Card>
         </Col>
     )
 }
 
 
+
+
+
 export default function BattleCounter(props) {
     return (
-        <Container>
+
+        <Container className="battleCounterContainer">
             <Row>
-                <PlayerCounter player={props.battleCounterState.players[0]} idx={0} />
-                <PlayerCounter player={props.battleCounterState.players[1]} idx={1} />
-
-                {console.log(props.battleCounterState.players[0])}
+                <Col md={{ size: "3", offset: "3" }}>
+                    <Button className="addPlayerButton" onClick={event => props.addPlayer()}>Add Player  <i className="fas fa-plus" style={{ color: "white", marginLeft: '1rem' }} /></Button>
+                </Col>
+                <Col md={{ size: "3" }}>
+                    <Button className="addPlayerButton" onClick={event => props.removeAllPlayers()}>Remove All<i className="fas fa-minus" style={{ color: "white", marginLeft: '1rem' }} /></Button>
+                </Col>
             </Row>
-
-
+            <Container className="counterContainer">
+                <Row>
+                    {props.battleCounterState.players.map((player, idx) => <PlayerCard playerInfo={player} key={idx} index={idx} removePlayer={props.removePlayer} increaseNumber={props.increaseNumber} />)}
+                </Row>
+            </Container>
         </Container>
 
     )

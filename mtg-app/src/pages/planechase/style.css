@@ -19,6 +19,15 @@
 
 }
 
+.planechaseButton{
+    margin-bottom: 1vmax !important; 
+    width: 100% !important;
+    font-size: 1.25rem !important;
+    font-weight: 500 !important;
+    line-height: 1.2 !important;
+}
+
+
 .planeCardContainer:active{
     background-color: #6c757d
 }
@@ -31,6 +40,7 @@
 
 .selectedCards{
     max-height: 20vmax;
+    min-height: 20vmax;
     overflow: scroll;
     overflow-x: hidden ;
 }
