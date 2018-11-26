@@ -15,8 +15,6 @@ function MenuButton(props) {
 
 
 
-
-
 export default function HomePage(props) {
 
     let imageDeckBuilder = "https://img.scryfall.com/cards/art_crop/en/soi/231.jpg?1517813031",
