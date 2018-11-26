@@ -6,7 +6,6 @@
         {
             "type": "npm",
             "script": "start",
-            "path": "mtg-app/",
             "problemMatcher": []
         }
     ]
