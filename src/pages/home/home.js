@@ -2,6 +2,21 @@ import React from 'react';
 import { Button, Container, Col, Row, CardImg } from 'reactstrap'
 import './style.css'
 
+function MenuButton(props) {
+    return (
+        <Col md="4" className="cards">
+            <Button id="menuCard" onClick={props.renderButton}>
+                <CardImg top width="100%" src={props.image} />
+                <p className="cardTitle"> {props.title}</p>
+            </Button>
+        </Col>
+    )
+}
+
+
+
+
+
 export default function HomePage(props) {
 
     let imageDeckBuilder = "https://img.scryfall.com/cards/art_crop/en/soi/231.jpg?1517813031",
@@ -13,42 +28,13 @@ export default function HomePage(props) {
     return (
         <Container>
             <Row>
-                <Col md="4" className="cards">
-                    <Button id="menuCard" onClick={props.renderAbout}>
-                        <CardImg top width="100%" src={imageAbout} />
-                        <p className="cardTitle"> About Battlesphere - WIP</p>
-                    </Button>
-                </Col>
-                <Col md="4" className="cards">
-                    <Button id="menuCard">
-                        <CardImg top width="100%" src={imageDeckBuilder} />
-                        <p className="cardTitle"> Deck Builder - WIP</p>
-                    </Button>
-                </Col>
-                <Col md="4" className="cards">
-                    <Button id="menuCard" onClick={props.renderCardSearch}>
-                        <CardImg top width="100%" src={imageCardSearch} />
-                        <p className="cardTitle"> Card Search </p>
-                    </Button>
-                </Col>
-                <Col md="4" className="cards">
-                    <Button id="menuCard">
-                        <CardImg top width="100%" src={imageSetLists} />
-                        <p className="cardTitle"> Set Lists - WIP</p>
-                    </Button>
-                </Col>
-                <Col md="4" className="cards">
-                    <Button id="menuCard" onClick={props.renderPlanechase}>
-                        <CardImg top width="100%" src={imagePlanechase} />
-                        <p className="cardTitle"> Planechase </p>
-                    </Button>
-                </Col>
-                <Col md="4" className="cards">
-                    <Button id="menuCard" onClick={props.renderBattleCounter}>
-                        <CardImg top width="100%" src={imageBattleCounter} />
-                        <p className="cardTitle"> Battle Counter - WIP</p>
-                    </Button>
-                </Col>
+
+                <MenuButton renderButton={props.renderAbout} image={imageAbout} title="About Battlesphere - WIP" id="AboutPage" />
+                <MenuButton renderButton="" image={imageDeckBuilder} title="Deck Builder - WIP" id="DeckBuilder" />
+                <MenuButton renderButton={props.renderCardSearch} image={imageCardSearch} title="Card Search" id="CardSearch" />
+                <MenuButton renderButton="" image={imageSetLists} title="Set Lists - WIP" id="SetLists" />
+                <MenuButton renderButton={props.renderPlanechase} image={imagePlanechase} title="Planechase" id="Planechase" />
+                <MenuButton renderButton={props.renderBattleCounter} image={imageBattleCounter} title="Battle Counter - WIP" id="BattleCounter" />
             </Row>
         </Container >
     )
