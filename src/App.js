@@ -1,311 +1,166 @@
 import React, { Component } from 'react';
-import { Button } from 'reactstrap';
-import HomePage from './pages/home/home';
-import CardSearch from './pages/card-search/card-search';
-import Planechase from './pages/planechase/planechase';
-import BattleCounter from './pages/battle-counter/battle-counter'
+import CardSearch from './pages/cardSearch'
+import Planechase from './pages/planechase'
+import converText from './utilities/symbolSwitch'
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 class App extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			renderStates: {
-				about: false,
-				deckBuilder: false,
-				cardSearch: false,
-				setLists: false,
-				planechase: false,
-				battleCounter: false,
-				home: true,
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      planechaseState: {
+        planeSearchUrl: "https://api.scryfall.com/cards/search?q=t=plane",
+        allPlaneCards: [],
+        gameDeck: [],
+      },
+      cardSearchState: {
+        inputValueCardName: '',
+        autocompleteUrl: 'https://api.scryfall.com/cards/autocomplete?q=',
+        fuzzyUrl: 'https://api.scryfall.com/cards/named?fuzzy=',
+        cardList: [],
+        selectedCard: {},
+        selectedMana: [],
+        badSearch: false,
+        modalState: false
+      }
+    }
+
+    // Card Search Functions 
+    this.handleSearchInputChange = this.handleSearchInputChange.bind(this);
+    this.toggleSearchModal = this.toggleSearchModal.bind(this);
+    this.handleSearch = this.handleSearch.bind(this);
+    this.removeModal = this.removeModal.bind(this);
+
+    // Planechase Functions
+    this.findAllPlaneCards = this.findAllPlaneCards.bind(this);
+    this.addToPlanechaseDeck = this.addToPlanechaseDeck.bind(this);
+    this.addAll = this.addAll.bind(this);
+    this.removeAll = this.removeAll.bind(this);
+  }
 
 
-			},
-			cardSearchState: {
-				inputValue: '',
-				cardName: 'Card Name',
-				cardType: '',
-				cardUri: 'https://d1u5p3l4wpay3k.cloudfront.net/mtgsalvation_gamepedia/thumb/f/f8/Magic_card_back.jpg/400px-Magic_card_back.jpg?version=4f6a80129fc99f07b7723141b122def4',
-				cardPrice: '',
-				legalities: {
-					standard: "",
-					future: "",
-					frontier: "",
-					modern: "",
-					legacy: "",
-					pauper: "",
-					vintage: "",
-					penny: "",
-					commander: "",
-					oneVone: "",
-					duel: "",
-					brawl: ""
-				}
-			},
-			planechaseState: {
-				gameStart: false,
-				urlForSearch: "https://api.scryfall.com/cards/search?q=t=plane",
-				planechaseCards: [],
-				playDeck: [],
-				playCounter: 1,
-			},
-			battleCounterState: {
-				numberOfPlayers: 0,
-				players: []
-			}
-		}
-		// Functions for the card search
-		this.handleSearchChange = this.handleSearchChange.bind(this);
-		this.handleFuzzySearch = this.handleFuzzySearch.bind(this);
+  // Card Search Functions 
+  handleSearchInputChange(event) {
+    let cardSearchState = this.state.cardSearchState;
+    cardSearchState.inputValueCardName = event.target.value;
+    cardSearchState.badSearch = false;
+    this.setState({ cardSearchState: cardSearchState });
+  }
+  handleSearch(event) {
+    let cardSearchState = this.state.cardSearchState,
+      searchAutoUrl = cardSearchState.autocompleteUrl,
+      searchFuzzyUrl = cardSearchState.fuzzyUrl,
+      self = this;
+    // Reset card list
+    cardSearchState.cardList = [];
+    if (cardSearchState.inputValueCardName.length > 0) {
+      searchAutoUrl = searchAutoUrl + cardSearchState.inputValueCardName.split(' ').join('+');
+      // First axios search to find all the cards with that name
+      axios.get(searchAutoUrl)
+        .then(function (response) {
+          let autocompleteName = response.data.data;
+          if (response.data.data.length > 0) {
+            toast.success("😎 Found something!")
+            // If there are cards in the list
+            // For each card returned, it will search for that card          
+            let urlsToSearch = autocompleteName.map(name => searchFuzzyUrl + name.split(' ').join('+'));
+            urlsToSearch.forEach(url =>
+              axios.get(url)
+                .then(function (response) {
+                  cardSearchState.cardList.push(response.data)
+                  cardSearchState.badSearch = false;
+                  self.setState({ cardSearchState: cardSearchState })
+                }).catch(function (error) {
+                  console.log(error);
+                }))
+          } else {
+            toast.error("😭 Found nothing ")
 
-		// Functions for Planechase
-		this.addAll = this.addAll.bind(this);
-		this.addCard = this.addCard.bind(this);
-		this.clearAll = this.clearAll.bind(this);
-		this.nextCard = this.nextCard.bind(this);
-		this.startGame = this.startGame.bind(this);
-		this.removeCard = this.removeCard.bind(this);
-		this.restartGame = this.restartGame.bind(this);
+            cardSearchState.cardList = [];
+            cardSearchState.badSearch = true;
+            self.setState({ cardSearchState: cardSearchState })
+            console.log("No Similar Cards")
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    } else {
+      toast.error("😭 Found nothing ")
+    }
+    event.preventDefault();
+  }
+  toggleSearchModal(card) {
+    let cardSearchState = this.state.cardSearchState;
+    cardSearchState.selectedCard = card
+    cardSearchState.selectedMana = converText(card.mana_cost)
+    cardSearchState.modalState = !cardSearchState.modalState;
+    this.setState({ cardSearchState: cardSearchState });
+  }
+  removeModal() {
+    let cardSearchState = this.state.cardSearchState;
+    cardSearchState.selectedCard = {};
+    cardSearchState.selectedMana = [];
+    cardSearchState.modalState = !cardSearchState.modalState;
+    this.setState({ cardSearchState: cardSearchState });
+  }
 
-		// Functions for Battle Counter 
-		this.addPlayer = this.addPlayer.bind(this);
-		this.removePlayer = this.removePlayer.bind(this);
-		this.increaseNumber = this.increaseNumber.bind(this);
-		this.removeAllPlayers = this.removeAllPlayers.bind(this);
+  // Planchase Functions
+  findAllPlaneCards(props) {
+    let planechaseState = this.state.planechaseState,
+      self = this;
+    if (planechaseState.allPlaneCards.length === 0) {
+      axios.get(planechaseState.planeSearchUrl)
+        .then(function (response) {
+          planechaseState.allPlaneCards = response.data.data
+          self.setState({ planechaseState: planechaseState })
+          console.log(response.data.data);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
 
-		// Render functions for each app
-		this.renderHome = this.renderHome.bind(this);
-		this.renderCardSearch = this.renderCardSearch.bind(this);
-		this.renderPlanechase = this.renderPlanechase.bind(this);
-		this.renderBattleCounter = this.renderBattleCounter.bind(this);
-	}
-
-	// Functions for the card search
-	handleSearchChange(event) {
-		let newValue = this.state.cardSearchState;
-		newValue.inputValue = event.target.value;
-		this.setState({ cardSearchState: newValue });
-	}
-	handleFuzzySearch(event) {
-		let self = this;
-		let searchState = this.state.cardSearchState,
-			fuzzyUrl = 'https://api.scryfall.com/cards/named?fuzzy=',
-			searchUrl = fuzzyUrl + searchState.inputValue.split(' ').join('+')
-		axios.get(searchUrl).then(function (response) {
-			let cardData = response.data;
-			console.log(cardData)
-			searchState.cardPrice = '$ ' + cardData.usd;
-			searchState.cardName = cardData.name;
-			searchState.cardType = cardData.type_line;
-			searchState.cardUri = cardData.image_uris.png;
-			searchState.legalities.standard = cardData.legalities.standard
-			searchState.legalities.future = cardData.legalities.future
-			searchState.legalities.frontier = cardData.legalities.frontier
-			searchState.legalities.modern = cardData.legalities.modern
-			searchState.legalities.legacy = cardData.legalities.legacy
-			searchState.legalities.pauper = cardData.legalities.pauper
-			searchState.legalities.vintage = cardData.legalities.vintage
-			searchState.legalities.penny = cardData.legalities.penny
-			searchState.legalities.commander = cardData.legalities.commander
-			searchState.legalities.oneVone = cardData.legalities["1v1"]
-			searchState.legalities.duel = cardData.legalities.duel
-			searchState.legalities.brawl = cardData.legalities.brawl
-			self.setState({ cardSearchState: searchState })
-			console.log(searchState);
-		}).catch(function (error) {
-			searchState.legalities.standard = "not_legal"
-			searchState.legalities.future = "not_legal"
-			searchState.legalities.frontier = "not_legal"
-			searchState.legalities.modern = "not_legal"
-			searchState.legalities.legacy = "not_legal"
-			searchState.legalities.pauper = "not_legal"
-			searchState.legalities.vintage = "not_legal"
-			searchState.legalities.penny = "not_legal"
-			searchState.legalities.commander = "not_legal"
-			searchState.legalities.oneVone = "not_legal"
-			searchState.legalities.duel = "not_legal"
-			searchState.legalities.brawl = "not_legal"
-			searchState.cardName = "Can't find a card by that name :(";
-			searchState.cardPrice = "$ 3.50";
-			searchState.cardType = "Please try again! ";
-			searchState.cardUri = "https://img.scryfall.com/cards/large/en/unh/120a.jpg?1517813031";
-			self.setState({ cardSearchState: searchState })
-			console.log("Opps! Something went wront!: ", error);
-		});
-		console.log(searchUrl)
-		event.preventDefault();
-	}
-	// Functions for Planechase
-	getAllPlaneCards(event) {
-		let planechaseState = this.state.planechaseState,
-			self = this;
-		if (planechaseState.planechaseCards.length <= 0) {
-			axios.get(planechaseState.urlForSearch)
-				.then(function (response) {
-					let allPlanesData = response.data.data;
-					allPlanesData.forEach((card, idx) => planechaseState.planechaseCards.push({ key: idx, name: card.name, image: card.image_uris.normal, text: card.oracle_text }))
-					console.log(planechaseState.planechaseCards);
-					self.setState({ planechaseState: planechaseState })
-				})
-				.catch(function (error) {
-					console.log("Opps! Something went wront!: ", error);
-				})
-		}
-	}
-	addCard(card) {
-		let planechaseState = this.state.planechaseState;
-		planechaseState.playDeck.push(card)
-		this.setState({ planechaseState: planechaseState })
-		console.log(this.state.planechaseState.playDeck)
-	}
-	addAll(card) {
-		let planechaseState = this.state.planechaseState;
-		planechaseState.planechaseCards.forEach(card => planechaseState.playDeck.push(card));
-		this.setState({ planechaseState: planechaseState })
-		console.log(this.state.planechaseState.playDeck)
-	}
-	removeCard(index) {
-		let planechaseState = this.state.planechaseState;
-		planechaseState.playDeck.splice(index, 1)
-		this.setState({ planechaseState: planechaseState })
-		console.log(this.state.planechaseState.playDeck)
-	}
-	clearAll(event) {
-		let planechaseState = this.state.planechaseState;
-		planechaseState.playDeck = [];
-		this.setState({ planechaseState: planechaseState })
-		console.log(this.state.planechaseState.playDeck)
-	}
-	shuffle(deck) {
-		for (let i = deck.length - 1; i > 0; i--) {
-			let j = Math.floor(Math.random() * (i + 1));
-			[deck[i], deck[j]] = [deck[j], deck[i]];
-		}
-		return deck
-	}
-	startGame(event) {
-		let planechaseState = this.state.planechaseState;
-
-		if (planechaseState.playDeck.length > 0) {
-			planechaseState.gameStart = true;
-			this.shuffle(planechaseState.playDeck)
-			this.setState({ planechaseState: planechaseState })
-		} else {
-			alert('You need to make a deck first!')
-		}
-	}
-	restartGame(event) {
-		let planechaseState = this.state.planechaseState;
-		planechaseState.gameStart = false;
-		this.setState({ planechaseState: planechaseState })
-	}
-	nextCard(event) {
-		let planechaseState = this.state.planechaseState;
-		planechaseState.playDeck.push(planechaseState.playDeck.shift());
-		planechaseState.playCounter++;
-		if (planechaseState.playCounter > planechaseState.playDeck.length) {
-			this.shuffle(planechaseState.playDeck);
-			planechaseState.playCounter = 1;
-		}
-		this.setState({ planechaseState: planechaseState })
-
-	}
-
-	// Functions for Battle Counter
-	addPlayer(event) {
-		let battleCounterState = this.state.battleCounterState;
-		battleCounterState.players.push([battleCounterState.numberOfPlayers, 20])
-		battleCounterState.numberOfPlayers++;
-		this.setState({ battleCounterState: battleCounterState })
-	}
-	removeAllPlayers(event) {
-		let battleCounterState = this.state.battleCounterState;
-		battleCounterState.players = [];
-		battleCounterState.numberOfPlayers = 0;
-		this.setState({ battleCounterState: battleCounterState })
-
-	}
-	removePlayer(index) {
-		let battleCounterState = this.state.battleCounterState;
-		battleCounterState.players.splice(index, 1)
-		battleCounterState.numberOfPlayers--;
-		this.setState({ battleCounterState: battleCounterState })
-	}
-	increaseNumber(player, index) {
-		let battleCounterState = this.state.battleCounterState;
-		battleCounterState.players[player][index]++
-		console.log(battleCounterState.players[player][index])
-		this.setState({ battleCounterState: battleCounterState })
+  }
+  addToPlanechaseDeck(card, idx) {
+    let planechaseState = this.state.planechaseState;
+    planechaseState.gameDeck.push(card)
+    toast.info("👌 " + card.name + " added to deck (" + planechaseState.gameDeck.length + " in Deck)")
+    this.setState({ planechaseState: planechaseState })
+    console.log(card.name, idx)
+  }
+  addAll() {
+    let planechaseState = this.state.planechaseState;
+    planechaseState.gameDeck = planechaseState.gameDeck.concat(planechaseState.allPlaneCards)
+    toast.info("🔥 ALL CARDS ADDED (" + planechaseState.gameDeck.length + " in Deck) 🔥")
+    this.setState({ planechaseState: planechaseState })
+  }
+  removeAll() {
+    let planechaseState = this.state.planechaseState;
+    planechaseState.gameDeck = [];
+    toast.info("💀 ALL CARDS REMOVED 💀");
+    this.setState({ planechaseState: planechaseState })
+  }
 
 
-	}
-
-	// Render functions for each app
-	renderCardSearch(event) {
-		let renderStates = this.state.renderStates
-		Object.keys(renderStates).forEach(key => renderStates[key] = false);
-		renderStates.cardSearch = true;
-		this.setState({ renderStates: renderStates })
-	}
-	renderAbout(event) {
-		let renderStates = this.state.renderStates
-		Object.keys(renderStates).forEach(key => renderStates[key] = false);
-		renderStates.about = true;
-		this.setState({ renderStates: renderStates })
-	}
-	renderPlanechase(event) {
-		let renderStates = this.state.renderStates
-		Object.keys(renderStates).forEach(key => renderStates[key] = false);
-		renderStates.planechase = true;
-		this.setState({ renderStates: renderStates });
-	}
-	renderDeckBuilder(event) {
-		let renderStates = this.state.renderStates
-		Object.keys(renderStates).forEach(key => renderStates[key] = false);
-		renderStates.deckBuilder = true;
-		this.setState({ renderStates: renderStates });
-	}
-	renderBattleCounter(event) {
-		let renderStates = this.state.renderStates
-		Object.keys(renderStates).forEach(key => renderStates[key] = false);
-		renderStates.battleCounter = true;
-		this.setState({ renderStates: renderStates });
-	}
-	renderHome(event) {
-		let renderStates = this.state.renderStates
-		Object.keys(renderStates).forEach(key => renderStates[key] = false);
-		renderStates.home = true;
-		this.setState({ renderStates: renderStates });
-	}
-
-
-	render() {
-		let home = <HomePage renderCardSearch={this.renderCardSearch} renderPlanechase={this.renderPlanechase} renderBattleCounter={this.renderBattleCounter} />,
-			cardSearch = <CardSearch handleSearchChange={this.handleSearchChange} handleFuzzySearch={this.handleFuzzySearch} cardSearchState={this.state.cardSearchState} />,
-			planechase = <Planechase planechaseState={this.state.planechaseState} startGame={this.startGame} restartGame={this.restartGame} nextCard={this.nextCard} addCard={this.addCard} addAll={this.addAll} removeCard={this.removeCard} clearAll={this.clearAll} />,
-			battleCounter = <BattleCounter battleCounterState={this.state.battleCounterState} addPlayer={this.addPlayer} removePlayer={this.removePlayer} removeAllPlayers={this.removeAllPlayers} increaseNumber={this.increaseNumber} />
-		this.getAllPlaneCards()
-		return (
-			<div className="App" >
-				<header className="App-header">
-					{/* <img src={logo} className="App-logo" alt="logo" /> */}
-					<Button onClick={this.renderHome}>Close!</Button>
-				</header>
-
-				{this.state.renderStates.home ? home : ''}
-				{/* {this.state.renderStates.about ? about : ''} */}
-				{this.state.renderStates.cardSearch ? cardSearch : ''}
-				{this.state.renderStates.planechase ? planechase : ''}
-				{this.state.renderStates.battleCounter ? battleCounter : ''}
-
-			</div>
-		);
-	}
+  render() {
+    return (
+      <div className="App">
+        <header className="App-header">
+        </header>
+        {this.findAllPlaneCards()}
+        <ToastContainer />
+        <CardSearch handleSearchInputChange={this.handleSearchInputChange} handleSearch={this.handleSearch} cardSearchState={this.state.cardSearchState} toggleSearchModal={this.toggleSearchModal} removeModal={this.removeModal} />
+        {/* <Planechase planechaseState={this.state.planechaseState} addToPlanechaseDeck={this.addToPlanechaseDeck} addAll={this.addAll} removeAll={this.removeAll} /> */}
+      </div>
+    );
+  }
 }
 
 export default App;
-
-
-// 6c757d
