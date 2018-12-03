@@ -19,8 +19,8 @@ export default function SetSearch(props) {
                         <tbody>
                             {props.setSearchState.allSets.map(set =>
                                 <tr>
-                                    <td><img className="setIcon" src={set.icon_svg_uri} alt="" /></td>
-                                    <td>{set.name}</td>
+                                    <td style={{ paddingLeft: (set.set_type === "token" ? "2rem" : "") }}><img className="setIcon" src={set.icon_svg_uri} alt="" /></td>
+                                    <td style={{ paddingLeft: (set.set_type === "token" ? "2rem" : "") }}>{set.name}</td>
                                     <td>{set.card_count}</td>
                                     <td>{set.released_at ? set.released_at : "-"}</td>
                                     <td>{set.set_type}</td>

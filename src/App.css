@@ -178,6 +178,9 @@
   height:1rem;
   text-align: left;
 }
+.tokenSet{
+  padding-left:2rem;
+}
 /* General */
 .manaSymbol{
   width:1.25rem;
