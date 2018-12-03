@@ -169,6 +169,15 @@
 .homeImage{
   width:100%
 }
+
+/* Set Search */
+.setsTable{
+  text-align: left;
+}
+.setIcon{
+  height:1rem;
+  text-align: left;
+}
 /* General */
 .manaSymbol{
   width:1.25rem;

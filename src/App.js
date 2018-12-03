@@ -4,6 +4,7 @@ import Home from './pages/home';
 import CardSearch from './pages/cardSearch';
 import Planechase from './pages/planechase';
 import BattleCounter from './pages/battleCounter';
+import SetSearch from './pages/setSearch';
 import converText from './utilities/symbolSwitch';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
@@ -39,15 +40,20 @@ class App extends Component {
       battleCounterState: {
         players: [],
 
+      },
+      setSearchState: {
+        allSets: [],
+        setSearchUrl: 'https://api.scryfall.com/sets'
       }
     }
 
+    // Home Page Functions
+    this.changePage = this.changePage.bind(this);
     // Card Search Functions 
     this.removeModal = this.removeModal.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.toggleSearchModal = this.toggleSearchModal.bind(this);
     this.handleSearchInputChange = this.handleSearchInputChange.bind(this);
-
     // Planechase Functions
     this.addAll = this.addAll.bind(this);
     this.endGame = this.endGame.bind(this);
@@ -57,19 +63,20 @@ class App extends Component {
     this.findAllPlaneCards = this.findAllPlaneCards.bind(this);
     this.addToPlanechaseDeck = this.addToPlanechaseDeck.bind(this);
     this.removeCardFromGameDeck = this.removeCardFromGameDeck.bind(this);
-
     // Battle Counter Functions
     this.addPlayer = this.addPlayer.bind(this);
     this.removeAllPlayers = this.removeAllPlayers.bind(this);
     this.addCounter = this.addCounter.bind(this);
     this.plusOne = this.plusOne.bind(this);
     this.minusOne = this.minusOne.bind(this);
-
-    // Home Page Functions
-    this.changePage = this.changePage.bind(this);
+    // Set Search Functions
+    this.findAllSets = this.findAllSets.bind(this);
   }
 
-
+  // Home Page Functions
+  changePage(index) {
+    this.setState({ pageView: index })
+  }
   // Card Search Functions 
   handleSearchInputChange(event) {
     let cardSearchState = this.state.cardSearchState;
@@ -135,7 +142,6 @@ class App extends Component {
     cardSearchState.modalState = !cardSearchState.modalState;
     this.setState({ cardSearchState: cardSearchState });
   }
-
   // Planchase Functions
   findAllPlaneCards(props) {
     let planechaseState = this.state.planechaseState,
@@ -227,7 +233,6 @@ class App extends Component {
     planechaseState.currentCardIdx = 1;
     this.setState({ planechaseState: planechaseState });
   }
-
   // Battle Counter Functions 
   addPlayer() {
     let battleCounterState = this.state.battleCounterState;
@@ -256,10 +261,22 @@ class App extends Component {
     this.setState({ battleCounterState: battleCounterState })
 
   }
+  // Set Search Functions
+  findAllSets() {
+    let setSearchState = this.state.setSearchState,
+      self = this;
+    if (setSearchState.allSets.length === 0) {
+      axios.get(setSearchState.setSearchUrl)
+        .then(function (response) {
+          setSearchState.allSets = response.data.data
+          self.setState({ setSearchState: setSearchState })
+          console.log(response.data.data);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
 
-  // Home Page Functions
-  changePage(index) {
-    this.setState({ pageView: index })
   }
 
   render() {
@@ -270,9 +287,8 @@ class App extends Component {
       <CardSearch handleSearchInputChange={this.handleSearchInputChange} handleSearch={this.handleSearch} cardSearchState={this.state.cardSearchState} toggleSearchModal={this.toggleSearchModal} removeModal={this.removeModal} />,
       <Planechase planechaseState={this.state.planechaseState} addToPlanechaseDeck={this.addToPlanechaseDeck} addAll={this.addAll} removeAll={this.removeAll} removeCardFromGameDeck={this.removeCardFromGameDeck} startGame={this.startGame} nextCard={this.nextCard} endGame={this.endGame} />,
       <BattleCounter battleCounterState={this.state.battleCounterState} addPlayer={this.addPlayer} removeAllPlayers={this.removeAllPlayers} addCounter={this.addCounter} plusOne={this.plusOne} minusOne={this.minusOne} />,
+      <SetSearch setSearchState={this.state.setSearchState} />
     ]
-
-
 
     return (
       <div className="App">
@@ -280,6 +296,7 @@ class App extends Component {
           <Button onClick={event => this.changePage(1)} />
         </header>
         {this.findAllPlaneCards()}
+        {this.findAllSets()}
         <ToastContainer />
         {pages[this.state.pageView]}
       </div>

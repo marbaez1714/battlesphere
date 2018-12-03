@@ -24,6 +24,8 @@ export default function Home(props) {
                 <HomeCard image={imageCardSearch} name="Card Search" idx={2} changePage={props.changePage} />
                 <HomeCard image={imagePlanechase} name="Planechase" idx={3} changePage={props.changePage} />
                 <HomeCard image={imageBattleCounter} name="Battlecounter" idx={4} changePage={props.changePage} />
+                <HomeCard image={imageSetLists} name="Set Search" idx={5} changePage={props.changePage} />
+
             </Row>
         </Container>
 
