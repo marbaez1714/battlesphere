@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
-import CardSearch from './pages/cardSearch'
-import Planechase from './pages/planechase'
-import converText from './utilities/symbolSwitch'
+import { Button } from 'reactstrap';
+import Home from './pages/home';
+import CardSearch from './pages/cardSearch';
+import Planechase from './pages/planechase';
+import BattleCounter from './pages/battleCounter';
+import converText from './utilities/symbolSwitch';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -14,10 +17,14 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      pageView: 1,
       planechaseState: {
         planeSearchUrl: "https://api.scryfall.com/cards/search?q=t=plane",
         allPlaneCards: [],
         gameDeck: [],
+        currentCardIdx: 1,
+        gameGoing: false,
+
       },
       cardSearchState: {
         inputValueCardName: '',
@@ -27,21 +34,39 @@ class App extends Component {
         selectedCard: {},
         selectedMana: [],
         badSearch: false,
-        modalState: false
+        modalState: false,
+      },
+      battleCounterState: {
+        players: [],
+
       }
     }
 
     // Card Search Functions 
-    this.handleSearchInputChange = this.handleSearchInputChange.bind(this);
-    this.toggleSearchModal = this.toggleSearchModal.bind(this);
-    this.handleSearch = this.handleSearch.bind(this);
     this.removeModal = this.removeModal.bind(this);
+    this.handleSearch = this.handleSearch.bind(this);
+    this.toggleSearchModal = this.toggleSearchModal.bind(this);
+    this.handleSearchInputChange = this.handleSearchInputChange.bind(this);
 
     // Planechase Functions
+    this.addAll = this.addAll.bind(this);
+    this.endGame = this.endGame.bind(this);
+    this.nextCard = this.nextCard.bind(this);
+    this.removeAll = this.removeAll.bind(this);
+    this.startGame = this.startGame.bind(this);
     this.findAllPlaneCards = this.findAllPlaneCards.bind(this);
     this.addToPlanechaseDeck = this.addToPlanechaseDeck.bind(this);
-    this.addAll = this.addAll.bind(this);
-    this.removeAll = this.removeAll.bind(this);
+    this.removeCardFromGameDeck = this.removeCardFromGameDeck.bind(this);
+
+    // Battle Counter Functions
+    this.addPlayer = this.addPlayer.bind(this);
+    this.removeAllPlayers = this.removeAllPlayers.bind(this);
+    this.addCounter = this.addCounter.bind(this);
+    this.plusOne = this.plusOne.bind(this);
+    this.minusOne = this.minusOne.bind(this);
+
+    // Home Page Functions
+    this.changePage = this.changePage.bind(this);
   }
 
 
@@ -147,17 +172,116 @@ class App extends Component {
     toast.info("💀 ALL CARDS REMOVED 💀");
     this.setState({ planechaseState: planechaseState })
   }
+  removeCardFromGameDeck(card, idx) {
+    // remove specific card based on the index of the card in the deck
+    let planechaseState = this.state.planechaseState;
+    planechaseState.gameDeck.splice(idx, 1)
+    toast.info("💀 " + card.name + " removed from deck (" + planechaseState.gameDeck.length + " in Deck)")
 
+    this.setState({ planechaseState: planechaseState })
+
+  }
+  startGame() {
+    let planechaseState = this.state.planechaseState;
+    function shuffle(deck) {
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+      return deck;
+    }
+    if (planechaseState.gameDeck.length > 0) {
+      planechaseState.gameDeck = shuffle(planechaseState.gameDeck);
+      planechaseState.gameGoing = true;
+    } else {
+      toast.info("You need to add some cards first!")
+
+    }
+    this.setState({ planechaseState: planechaseState })
+
+  }
+  nextCard() {
+    let planechaseState = this.state.planechaseState;
+    planechaseState.gameDeck.push(planechaseState.gameDeck.shift());
+    planechaseState.currentCardIdx++;
+    function shuffle(deck) {
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+      return deck;
+    }
+    if (planechaseState.currentCardIdx === planechaseState.gameDeck.length) {
+      shuffle(planechaseState.gameDeck);
+      toast.info("Deck shuffled!")
+
+      planechaseState.currentCardIdx = 1;
+    }
+    this.setState({ planechaseState: planechaseState });
+
+
+  }
+  endGame() {
+    let planechaseState = this.state.planechaseState;
+    planechaseState.gameGoing = false;
+    planechaseState.currentCardIdx = 1;
+    this.setState({ planechaseState: planechaseState });
+  }
+
+  // Battle Counter Functions 
+  addPlayer() {
+    let battleCounterState = this.state.battleCounterState;
+    battleCounterState.players.push([20])
+    this.setState({ battleCounterState: battleCounterState })
+  }
+  removeAllPlayers() {
+    let battleCounterState = this.state.battleCounterState;
+    battleCounterState.players = [];
+    this.setState({ battleCounterState: battleCounterState })
+  }
+  addCounter(idx) {
+    let battleCounterState = this.state.battleCounterState;
+    battleCounterState.players[idx].push(0)
+    this.setState({ battleCounterState: battleCounterState })
+  }
+  plusOne(playerIdx, idx) {
+    let battleCounterState = this.state.battleCounterState;
+    battleCounterState.players[playerIdx][idx]++;
+    this.setState({ battleCounterState: battleCounterState })
+
+  }
+  minusOne(playerIdx, idx) {
+    let battleCounterState = this.state.battleCounterState;
+    battleCounterState.players[playerIdx][idx]--;
+    this.setState({ battleCounterState: battleCounterState })
+
+  }
+
+  // Home Page Functions
+  changePage(index) {
+    this.setState({ pageView: index })
+  }
 
   render() {
+
+    let pages = [
+      "",
+      <Home changePage={this.changePage} />,
+      <CardSearch handleSearchInputChange={this.handleSearchInputChange} handleSearch={this.handleSearch} cardSearchState={this.state.cardSearchState} toggleSearchModal={this.toggleSearchModal} removeModal={this.removeModal} />,
+      <Planechase planechaseState={this.state.planechaseState} addToPlanechaseDeck={this.addToPlanechaseDeck} addAll={this.addAll} removeAll={this.removeAll} removeCardFromGameDeck={this.removeCardFromGameDeck} startGame={this.startGame} nextCard={this.nextCard} endGame={this.endGame} />,
+      <BattleCounter battleCounterState={this.state.battleCounterState} addPlayer={this.addPlayer} removeAllPlayers={this.removeAllPlayers} addCounter={this.addCounter} plusOne={this.plusOne} minusOne={this.minusOne} />,
+    ]
+
+
+
     return (
       <div className="App">
         <header className="App-header">
+          <Button onClick={event => this.changePage(1)} />
         </header>
         {this.findAllPlaneCards()}
         <ToastContainer />
-        <CardSearch handleSearchInputChange={this.handleSearchInputChange} handleSearch={this.handleSearch} cardSearchState={this.state.cardSearchState} toggleSearchModal={this.toggleSearchModal} removeModal={this.removeModal} />
-        {/* <Planechase planechaseState={this.state.planechaseState} addToPlanechaseDeck={this.addToPlanechaseDeck} addAll={this.addAll} removeAll={this.removeAll} /> */}
+        {pages[this.state.pageView]}
       </div>
     );
   }
