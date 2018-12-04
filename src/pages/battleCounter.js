@@ -1,16 +1,16 @@
 import React from 'react';
-import { Container, Card, CardBody, CardTitle, CardSubtitle, CardText, CardHeader, Col, Input, Form, InputGroup, InputGroupAddon, Button, Row, Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
+import { Container, Card, CardBody, CardHeader, Col, Button, Row } from 'reactstrap';
 import '../App.css';
 
 function PlayerCard(props) {
     return (
         <Col xs="6" md="4" style={{ paddingLeft: "0.5vh", paddingRight: "0.5vh" }}>
-            <Card className="playerCard scale-in-center" style={{ borderRadius: '0' }}>
+            <Card className="playerCard scale-in-center" style={{ borderRadius: '0' }} key={props.idx}>
                 <CardHeader><input className="playerName" placeholder={"Player " + props.playerNumber} /></CardHeader>
                 <CardBody style={{ padding: "1vh" }}>
                     <Row>
                         {props.player.map((player, idx) =>
-                            <Col xs="12">
+                            <Col xs="12" key={idx}>
                                 <Row className="counterNumber">
                                     <Col xs="4" className="plusContainer">
                                         <i className="far fa-plus-square" onClick={event => props.plusOne(props.idx, idx)} style={{ cursor: "pointer" }} />
@@ -46,7 +46,7 @@ export default function BattleCounter(props) {
                 </Col>
             </Row>
             <Row>
-                {props.battleCounterState.players.map((player, idx) => <PlayerCard player={player} playerNumber={idx + 1} idx={idx} addCounter={props.addCounter} plusOne={props.plusOne} minusOne={props.minusOne} />)}
+                {props.battleCounterState.players.map((player, idx) => <PlayerCard player={player} playerNumber={idx + 1} idx={idx} addCounter={props.addCounter} plusOne={props.plusOne} minusOne={props.minusOne} key={idx} />)}
             </Row>
         </Container>
     )

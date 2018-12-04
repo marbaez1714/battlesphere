@@ -1,10 +1,11 @@
 import React from 'react';
-import { Container, Card, CardBody, CardTitle, CardSubtitle, CardText, CardHeader, Col, Input, Form, InputGroup, InputGroupAddon, Button, Row, Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
+import { Container, Col, Button, Row } from 'reactstrap';
 
 function HomeCard(props) {
     return (
         <Col xs="6" md="4" className="homeCardWrapper" style={{ paddingLeft: "0.5vh", paddingRight: "0.5vh", marginTop: "1vh", marginBottom: "1vh" }}>
-            <Button className="homeCard"> <img className="homeImage" src={props.image} onClick={event => props.changePage(props.idx)} />
+            <Button className="homeCard">
+                <img className="homeImage" src={props.image} onClick={event => props.changePage(props.idx)} alt="" />
                 <p className="homeText">{props.name}</p>
             </Button>
         </Col>

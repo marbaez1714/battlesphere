@@ -31,6 +31,7 @@ class App extends Component {
         inputValueCardName: '',
         autocompleteUrl: 'https://api.scryfall.com/cards/autocomplete?q=',
         fuzzyUrl: 'https://api.scryfall.com/cards/named?fuzzy=',
+        searchUrl: "https://api.scryfall.com/cards/search?q=",
         cardList: [],
         selectedCard: {},
         selectedMana: [],
@@ -51,9 +52,9 @@ class App extends Component {
     this.changePage = this.changePage.bind(this);
     // Card Search Functions 
     this.removeModal = this.removeModal.bind(this);
-    this.handleSearch = this.handleSearch.bind(this);
     this.toggleSearchModal = this.toggleSearchModal.bind(this);
     this.handleSearchInputChange = this.handleSearchInputChange.bind(this);
+    this.handleNewSearch = this.handleNewSearch.bind(this)
     // Planechase Functions
     this.addAll = this.addAll.bind(this);
     this.endGame = this.endGame.bind(this);
@@ -84,50 +85,49 @@ class App extends Component {
     cardSearchState.badSearch = false;
     this.setState({ cardSearchState: cardSearchState });
   }
-  handleSearch(event) {
+  handleNewSearch(event) {
     let cardSearchState = this.state.cardSearchState,
-      searchAutoUrl = cardSearchState.autocompleteUrl,
-      searchFuzzyUrl = cardSearchState.fuzzyUrl,
+      searchUrl = cardSearchState.searchUrl,
       self = this;
-    // Reset card list
     cardSearchState.cardList = [];
+    // only search if there is a value in the search field
     if (cardSearchState.inputValueCardName.length > 0) {
-      searchAutoUrl = searchAutoUrl + cardSearchState.inputValueCardName.split(' ').join('+');
-      // First axios search to find all the cards with that name
-      axios.get(searchAutoUrl)
+      // create the search url
+      searchUrl = searchUrl + cardSearchState.inputValueCardName.split(' ').join('+');
+      // create axios request
+      axios.get(searchUrl)
         .then(function (response) {
-          let autocompleteName = response.data.data;
-          if (response.data.data.length > 0) {
+          let searchData = response.data.data
+          // if the response ha something in it
+          if (searchData.length > 0) {
             toast.success("😎 Found something!")
-            // If there are cards in the list
-            // For each card returned, it will search for that card          
-            let urlsToSearch = autocompleteName.map(name => searchFuzzyUrl + name.split(' ').join('+'));
-            urlsToSearch.forEach(url =>
-              axios.get(url)
-                .then(function (response) {
-                  cardSearchState.cardList.push(response.data)
-                  cardSearchState.badSearch = false;
-                  self.setState({ cardSearchState: cardSearchState })
-                }).catch(function (error) {
-                  console.log(error);
-                }))
+            searchData.forEach(card => {
+              if (card.image_uris) {
+                cardSearchState.cardList.push(card)
+                cardSearchState.badSearch = false;
+                self.setState({ cardSearchState: cardSearchState })
+              } else {
+                console.log(card.name + "ommited from results because of an error")
+              }
+            })
           } else {
             toast.error("😭 Found nothing ")
-
             cardSearchState.cardList = [];
             cardSearchState.badSearch = true;
             self.setState({ cardSearchState: cardSearchState })
             console.log("No Similar Cards")
           }
-        })
+        }
+        )
         .catch(function (error) {
           console.log(error);
         });
     } else {
       toast.error("😭 Found nothing ")
     }
-    event.preventDefault();
+    event.preventDefault()
   }
+
   toggleSearchModal(card) {
     let cardSearchState = this.state.cardSearchState;
     cardSearchState.selectedCard = card
@@ -151,7 +151,6 @@ class App extends Component {
         .then(function (response) {
           planechaseState.allPlaneCards = response.data.data
           self.setState({ planechaseState: planechaseState })
-          console.log(response.data.data);
         })
         .catch(function (error) {
           console.log(error);
@@ -164,7 +163,6 @@ class App extends Component {
     planechaseState.gameDeck.push(card)
     toast.info("👌 " + card.name + " added to deck (" + planechaseState.gameDeck.length + " in Deck)")
     this.setState({ planechaseState: planechaseState })
-    console.log(card.name, idx)
   }
   addAll() {
     let planechaseState = this.state.planechaseState;
@@ -270,7 +268,7 @@ class App extends Component {
         .then(function (response) {
           setSearchState.allSets = response.data.data
           self.setState({ setSearchState: setSearchState })
-          console.log(response.data.data);
+
         })
         .catch(function (error) {
           console.log(error);
@@ -284,7 +282,7 @@ class App extends Component {
     let pages = [
       "",
       <Home changePage={this.changePage} />,
-      <CardSearch handleSearchInputChange={this.handleSearchInputChange} handleSearch={this.handleSearch} cardSearchState={this.state.cardSearchState} toggleSearchModal={this.toggleSearchModal} removeModal={this.removeModal} />,
+      <CardSearch handleNewSearch={this.handleNewSearch} handleSearchInputChange={this.handleSearchInputChange} cardSearchState={this.state.cardSearchState} toggleSearchModal={this.toggleSearchModal} removeModal={this.removeModal} />,
       <Planechase planechaseState={this.state.planechaseState} addToPlanechaseDeck={this.addToPlanechaseDeck} addAll={this.addAll} removeAll={this.removeAll} removeCardFromGameDeck={this.removeCardFromGameDeck} startGame={this.startGame} nextCard={this.nextCard} endGame={this.endGame} />,
       <BattleCounter battleCounterState={this.state.battleCounterState} addPlayer={this.addPlayer} removeAllPlayers={this.removeAllPlayers} addCounter={this.addCounter} plusOne={this.plusOne} minusOne={this.minusOne} />,
       <SetSearch setSearchState={this.state.setSearchState} />

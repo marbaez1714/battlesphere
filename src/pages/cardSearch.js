@@ -81,7 +81,7 @@ function Card(props) {
 export default function CardSearch(props) {
     return (
         <Container className="CardSearchWrapper">
-            <SearchBox handleSearchInputChange={props.handleSearchInputChange} handleSearch={props.handleSearch} searchSuccessNotify={props.searchSuccessNotify} />
+            <SearchBox handleSearchInputChange={props.handleSearchInputChange} handleSearch={props.handleNewSearch} searchSuccessNotify={props.searchSuccessNotify} />
             <Row style={{ paddingLeft: "1vh", paddingRight: "1vh" }}>
                 {props.cardSearchState.cardList.map((card, idx) => <Card key={idx} card={card} toggleSearchModal={props.toggleSearchModal} />)}
             </Row>
@@ -90,3 +90,4 @@ export default function CardSearch(props) {
 
     )
 }
+
