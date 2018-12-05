@@ -4,7 +4,7 @@ import { Container, Col, Row, Table } from 'reactstrap'
 
 function SetRow(props) {
     return (
-        <tr key={props.idx}>
+        <tr className="setRow" key={props.idx} onClick={event => props.selectSet(props.set)}>
             <td style={{ paddingLeft: (props.set.set_type === "token" ? "2rem" : "") }}><img className="setIcon" src={props.set.icon_svg_uri} alt="" /></td>
             <td style={{ paddingLeft: (props.set.set_type === "token" ? "2rem" : "") }}>{props.set.name}</td>
             <td>{props.set.card_count}</td>
@@ -32,7 +32,7 @@ export default function SetSearch(props) {
                             </tr>
                         </thead>
                         <tbody>
-                            {props.setSearchState.allSets.map((set, idx) => <SetRow set={set} idx={idx} key={idx} />)}
+                            {props.setSearchState.allSets.map((set, idx) => <SetRow set={set} idx={idx} key={idx} selectSet={props.selectSet} />)}
                         </tbody>
                     </Table>
                 </Col>

@@ -44,7 +44,10 @@ class App extends Component {
       },
       setSearchState: {
         allSets: [],
-        setSearchUrl: 'https://api.scryfall.com/sets'
+        setSearchUrl: 'https://api.scryfall.com/sets',
+        selectedSet: {},
+        showSet: false,
+        setData: [],
       }
     }
 
@@ -72,6 +75,8 @@ class App extends Component {
     this.minusOne = this.minusOne.bind(this);
     // Set Search Functions
     this.findAllSets = this.findAllSets.bind(this);
+    this.selectSet = this.selectSet.bind(this);
+    this.setSearch = this.setSearch.bind(this);
   }
 
   // Home Page Functions
@@ -266,8 +271,8 @@ class App extends Component {
     if (setSearchState.allSets.length === 0) {
       axios.get(setSearchState.setSearchUrl)
         .then(function (response) {
-          setSearchState.allSets = response.data.data
-          self.setState({ setSearchState: setSearchState })
+          setSearchState.allSets = response.data.data;
+          self.setState({ setSearchState: setSearchState });
 
         })
         .catch(function (error) {
@@ -276,6 +281,40 @@ class App extends Component {
     }
 
   }
+  selectSet(set) {
+    let setSearchState = this.state.setSearchState;
+    setSearchState.selectedSet = set;
+    setSearchState.setData = [];
+    this.setSearch(set.search_uri)
+    this.setState({ setSearchState: setSearchState });
+
+  }
+
+  setSearch(uri) {
+    let setSearchState = this.state.setSearchState,
+      self = this;
+    axios.get(uri).
+      then(function (response) {
+        if (response.data.has_more) {
+          response.data.data.forEach(card => setSearchState.setData.push(card))
+          self.setState({ setSearchState: setSearchState });
+          self.setSearch(response.data.next_page)
+          console.log(setSearchState.setData)
+        } else {
+          response.data.data.forEach(card => setSearchState.setData.push(card))
+          self.setState({ setSearchState: setSearchState });
+          console.log(setSearchState.setData)
+        }
+      })
+  }
+
+
+
+
+
+
+
+
 
   render() {
 
@@ -285,7 +324,7 @@ class App extends Component {
       <CardSearch handleNewSearch={this.handleNewSearch} handleSearchInputChange={this.handleSearchInputChange} cardSearchState={this.state.cardSearchState} toggleSearchModal={this.toggleSearchModal} removeModal={this.removeModal} />,
       <Planechase planechaseState={this.state.planechaseState} addToPlanechaseDeck={this.addToPlanechaseDeck} addAll={this.addAll} removeAll={this.removeAll} removeCardFromGameDeck={this.removeCardFromGameDeck} startGame={this.startGame} nextCard={this.nextCard} endGame={this.endGame} />,
       <BattleCounter battleCounterState={this.state.battleCounterState} addPlayer={this.addPlayer} removeAllPlayers={this.removeAllPlayers} addCounter={this.addCounter} plusOne={this.plusOne} minusOne={this.minusOne} />,
-      <SetSearch setSearchState={this.state.setSearchState} />
+      <SetSearch setSearchState={this.state.setSearchState} selectSet={this.selectSet} setSearch={this.setSearch} />
     ]
 
     return (

@@ -181,6 +181,9 @@
 .tokenSet{
   padding-left:2rem;
 }
+.setRow{
+  cursor: pointer;
+}
 /* General */
 .manaSymbol{
   width:1.25rem;
