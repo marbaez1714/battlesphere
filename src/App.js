@@ -48,6 +48,11 @@ class App extends Component {
         selectedSet: {},
         showSet: false,
         setData: [],
+        loading: false,
+        selectedCard: [],
+        selectedMana: [],
+        modalState: false,
+
       }
     }
 
@@ -77,6 +82,9 @@ class App extends Component {
     this.findAllSets = this.findAllSets.bind(this);
     this.selectSet = this.selectSet.bind(this);
     this.setSearch = this.setSearch.bind(this);
+    this.toggleSetSearchModal = this.toggleSetSearchModal.bind(this);
+    this.removeSetModal = this.removeSetModal.bind(this);
+    this.returnToSets = this.returnToSets.bind(this);
   }
 
   // Home Page Functions
@@ -112,7 +120,7 @@ class App extends Component {
                 cardSearchState.badSearch = false;
                 self.setState({ cardSearchState: cardSearchState })
               } else {
-                console.log(card.name + "ommited from results because of an error")
+                console.log(card.name + " omited from results because of an error")
               }
             })
           } else {
@@ -293,27 +301,48 @@ class App extends Component {
   setSearch(uri) {
     let setSearchState = this.state.setSearchState,
       self = this;
-    axios.get(uri).
-      then(function (response) {
+    setSearchState.loading = true;
+
+    axios.get(uri)
+      .then(function (response) {
         if (response.data.has_more) {
-          response.data.data.forEach(card => setSearchState.setData.push(card))
+          response.data.data.forEach(card => setSearchState.setData.push(card));
+          setSearchState.loading = true;
           self.setState({ setSearchState: setSearchState });
           self.setSearch(response.data.next_page)
           console.log(setSearchState.setData)
         } else {
-          response.data.data.forEach(card => setSearchState.setData.push(card))
+          response.data.data.forEach(card => setSearchState.setData.push(card));
+          setSearchState.loading = false;
+          setSearchState.showSet = true;
           self.setState({ setSearchState: setSearchState });
           console.log(setSearchState.setData)
         }
       })
   }
 
+  toggleSetSearchModal(card) {
+    let setSearchState = this.state.setSearchState;
+    setSearchState.selectedCard = card
+    setSearchState.selectedMana = converText(card.mana_cost)
+    setSearchState.modalState = !setSearchState.modalState;
+    this.setState({ setSearchState: setSearchState });
+  }
+  removeSetModal() {
+    let setSearchState = this.state.setSearchState;
+    setSearchState.selectedCard = {};
+    setSearchState.selectedMana = [];
+    setSearchState.modalState = !setSearchState.modalState;
+    this.setState({ setSearchState: setSearchState });
+  }
+  returnToSets() {
+    let setSearchState = this.state.setSearchState;
+    setSearchState.showSet = false;
+    setSearchState.setData = [];
+    this.setState({ setSearchState: setSearchState });
 
 
-
-
-
-
+  }
 
 
   render() {
@@ -324,7 +353,7 @@ class App extends Component {
       <CardSearch handleNewSearch={this.handleNewSearch} handleSearchInputChange={this.handleSearchInputChange} cardSearchState={this.state.cardSearchState} toggleSearchModal={this.toggleSearchModal} removeModal={this.removeModal} />,
       <Planechase planechaseState={this.state.planechaseState} addToPlanechaseDeck={this.addToPlanechaseDeck} addAll={this.addAll} removeAll={this.removeAll} removeCardFromGameDeck={this.removeCardFromGameDeck} startGame={this.startGame} nextCard={this.nextCard} endGame={this.endGame} />,
       <BattleCounter battleCounterState={this.state.battleCounterState} addPlayer={this.addPlayer} removeAllPlayers={this.removeAllPlayers} addCounter={this.addCounter} plusOne={this.plusOne} minusOne={this.minusOne} />,
-      <SetSearch setSearchState={this.state.setSearchState} selectSet={this.selectSet} setSearch={this.setSearch} />
+      <SetSearch setSearchState={this.state.setSearchState} selectSet={this.selectSet} setSearch={this.setSearch} toggleSetSearchModal={this.toggleSetSearchModal} removeSetModal={this.removeSetModal} returnToSets={this.returnToSets} />
     ]
 
     return (
