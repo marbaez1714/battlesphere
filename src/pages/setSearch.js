@@ -5,8 +5,8 @@ import Loading from '../images/loading.svg';
 function SetRow(props) {
     return (
         <tr className="setRow" key={props.idx} onClick={event => props.selectSet(props.set)}>
-            <td style={{ paddingLeft: (props.set.set_type === "token" ? "2rem" : "") }}><img className="setIcon" src={props.set.icon_svg_uri} alt="" /></td>
-            <td style={{ paddingLeft: (props.set.set_type === "token" ? "2rem" : "") }}>{props.set.name}</td>
+            <td ><img className="setIcon" src={props.set.icon_svg_uri} alt="" /></td>
+            <td >{props.set.name}</td>
             <td>{props.set.card_count}</td>
             <td>{props.set.released_at ? props.set.released_at : "-"}</td>
             <td>{props.set.set_type}</td>
@@ -18,7 +18,7 @@ function SetTable(props) {
     return (
         <Row>
             <Col xs={{ size: "10", offset: "1" }}>
-                <Table hover size="sm" className="setsTable" responsive>
+                <Table hover size="sm" className="setsTable" responsive borderless>
                     <thead>
                         <tr>
                             <th></th>

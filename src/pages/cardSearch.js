@@ -62,6 +62,10 @@ function CardDataModal(props) {
                 </Row>
 
             </ModalFooter>
+            <ModalFooter>
+                <Button className="addButton" onClick={event => props.addToDeck(cardData)}>Add to Deck</Button>
+            </ModalFooter>
+
 
 
         </Modal >
@@ -85,7 +89,7 @@ export default function CardSearch(props) {
             <Row style={{ paddingLeft: "1vh", paddingRight: "1vh" }}>
                 {props.cardSearchState.cardList.map((card, idx) => <Card key={idx} card={card} toggleSearchModal={props.toggleSearchModal} />)}
             </Row>
-            <CardDataModal cardSearchState={props.cardSearchState} removeModal={props.removeModal} />
+            <CardDataModal cardSearchState={props.cardSearchState} removeModal={props.removeModal} addToDeck={props.addToDeck} />
         </Container>
 
     )

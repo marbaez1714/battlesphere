@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { Button } from 'reactstrap';
 import Home from './pages/home';
+import SetSearch from './pages/setSearch';
 import CardSearch from './pages/cardSearch';
 import Planechase from './pages/planechase';
+import DeckBuilder from './pages/deckBuilder';
 import BattleCounter from './pages/battleCounter';
-import SetSearch from './pages/setSearch';
 import converText from './utilities/symbolSwitch';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
@@ -53,6 +54,9 @@ class App extends Component {
         selectedMana: [],
         modalState: false,
 
+      },
+      deckBuilderState: {
+        deck: []
       }
     }
 
@@ -85,6 +89,9 @@ class App extends Component {
     this.toggleSetSearchModal = this.toggleSetSearchModal.bind(this);
     this.removeSetModal = this.removeSetModal.bind(this);
     this.returnToSets = this.returnToSets.bind(this);
+
+    // Deck Builder Functions
+    this.addToDeck = this.addToDeck.bind(this);
   }
 
   // Home Page Functions
@@ -297,7 +304,6 @@ class App extends Component {
     this.setState({ setSearchState: setSearchState });
 
   }
-
   setSearch(uri) {
     let setSearchState = this.state.setSearchState,
       self = this;
@@ -320,7 +326,6 @@ class App extends Component {
         }
       })
   }
-
   toggleSetSearchModal(card) {
     let setSearchState = this.state.setSearchState;
     setSearchState.selectedCard = card
@@ -343,6 +348,13 @@ class App extends Component {
 
 
   }
+  // Deck Builder Functions
+  addToDeck(card) {
+    let deckBuilderState = this.state.deckBuilderState;
+    deckBuilderState.deck.push(card)
+    toast.info(card.name + " added to deck (" + deckBuilderState.deck.length + " in deck)")
+    this.setSearch({ deckBuilderState: deckBuilderState })
+  }
 
 
   render() {
@@ -350,10 +362,11 @@ class App extends Component {
     let pages = [
       "",
       <Home changePage={this.changePage} />,
-      <CardSearch handleNewSearch={this.handleNewSearch} handleSearchInputChange={this.handleSearchInputChange} cardSearchState={this.state.cardSearchState} toggleSearchModal={this.toggleSearchModal} removeModal={this.removeModal} />,
+      <CardSearch addToDeck={this.addToDeck} handleNewSearch={this.handleNewSearch} handleSearchInputChange={this.handleSearchInputChange} cardSearchState={this.state.cardSearchState} toggleSearchModal={this.toggleSearchModal} removeModal={this.removeModal} />,
       <Planechase planechaseState={this.state.planechaseState} addToPlanechaseDeck={this.addToPlanechaseDeck} addAll={this.addAll} removeAll={this.removeAll} removeCardFromGameDeck={this.removeCardFromGameDeck} startGame={this.startGame} nextCard={this.nextCard} endGame={this.endGame} />,
       <BattleCounter battleCounterState={this.state.battleCounterState} addPlayer={this.addPlayer} removeAllPlayers={this.removeAllPlayers} addCounter={this.addCounter} plusOne={this.plusOne} minusOne={this.minusOne} />,
-      <SetSearch setSearchState={this.state.setSearchState} selectSet={this.selectSet} setSearch={this.setSearch} toggleSetSearchModal={this.toggleSetSearchModal} removeSetModal={this.removeSetModal} returnToSets={this.returnToSets} />
+      <SetSearch setSearchState={this.state.setSearchState} selectSet={this.selectSet} setSearch={this.setSearch} toggleSetSearchModal={this.toggleSetSearchModal} removeSetModal={this.removeSetModal} returnToSets={this.returnToSets} />,
+      <DeckBuilder />
     ]
 
     return (
