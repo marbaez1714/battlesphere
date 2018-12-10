@@ -7,6 +7,7 @@ import Planechase from './pages/planechase';
 import DeckBuilder from './pages/deckBuilder';
 import BattleCounter from './pages/battleCounter';
 import converText from './utilities/symbolSwitch';
+import { splitMana } from './utilities/countMana';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -56,7 +57,38 @@ class App extends Component {
 
       },
       deckBuilderState: {
-        deck: []
+        deck: [],
+        allMana: "",
+        allManaArray: [],
+        manaTotals: {
+          xMana: 0,
+          yMana: 0,
+          zMana: 0,
+          whiteOrBlueMana: 0,
+          whiteOrBlackMana: 0,
+          blackOrRedMana: 0,
+          blackOrGreenMana: 0,
+          blueOrBlackMana: 0,
+          blueOrRedMana: 0,
+          redOrGreenMana: 0,
+          redOrWhiteMana: 0,
+          greenOrWhiteMana: 0,
+          greenOrBlueMana: 0,
+          genericMana: 0,
+          whiteMana: 0,
+          blueMana: 0,
+          blackMana: 0,
+          redMana: 0,
+          greenMana: 0,
+          coloredOrLife: 0,
+          whiteOrLife: 0,
+          blueOrLife: 0,
+          blackOrLife: 0,
+          redOrLife: 0,
+          greenOrLife: 0,
+          colorlessMana: 0,
+          snowMana: 0,
+        }
       }
     }
 
@@ -92,6 +124,7 @@ class App extends Component {
 
     // Deck Builder Functions
     this.addToDeck = this.addToDeck.bind(this);
+    this.addManaCost = this.addManaCost.bind(this);
   }
 
   // Home Page Functions
@@ -147,7 +180,6 @@ class App extends Component {
     }
     event.preventDefault()
   }
-
   toggleSearchModal(card) {
     let cardSearchState = this.state.cardSearchState;
     cardSearchState.selectedCard = card
@@ -325,6 +357,9 @@ class App extends Component {
           console.log(setSearchState.setData)
         }
       })
+      .catch(function (error) {
+        console.log(error)
+      })
   }
   toggleSetSearchModal(card) {
     let setSearchState = this.state.setSearchState;
@@ -351,11 +386,191 @@ class App extends Component {
   // Deck Builder Functions
   addToDeck(card) {
     let deckBuilderState = this.state.deckBuilderState;
-    deckBuilderState.deck.push(card)
-    toast.info(card.name + " added to deck (" + deckBuilderState.deck.length + " in deck)")
-    this.setSearch({ deckBuilderState: deckBuilderState })
+    deckBuilderState.deck.push(card);
+    deckBuilderState.manaTotals = {
+      xMana: 0,
+      yMana: 0,
+      zMana: 0,
+      whiteOrBlueMana: 0,
+      whiteOrBlackMana: 0,
+      blackOrRedMana: 0,
+      blackOrGreenMana: 0,
+      blueOrBlackMana: 0,
+      blueOrRedMana: 0,
+      redOrGreenMana: 0,
+      redOrWhiteMana: 0,
+      greenOrWhiteMana: 0,
+      greenOrBlueMana: 0,
+      genericMana: 0,
+      whiteMana: 0,
+      blueMana: 0,
+      blackMana: 0,
+      redMana: 0,
+      greenMana: 0,
+      coloredOrLife: 0,
+      whiteOrLife: 0,
+      blueOrLife: 0,
+      blackOrLife: 0,
+      redOrLife: 0,
+      greenOrLife: 0,
+      colorlessMana: 0,
+      snowMana: 0,
+    }
+    deckBuilderState.allMana = deckBuilderState.allMana + card.mana_cost;
+    deckBuilderState.allManaArray = splitMana(deckBuilderState.allMana);
+    deckBuilderState.allManaArray.forEach(mana => this.addManaCost(mana))
+    toast.info(card.name + " added to deck (" + deckBuilderState.deck.length + " in deck)");
+    this.setState({ deckBuilderState: deckBuilderState });
   }
+  addManaCost(mana) {
+    let deckBuilderState = this.state.deckBuilderState,
+      manaTotals = this.state.deckBuilderState.manaTotals;
+    switch (mana) {
+      case "{W/U}":
+        // white or blue mana
+        manaTotals.whiteOrBlueMana++;
+        break;
+      case "{W/B}":
+        // white or black mana
+        manaTotals.whiteOrBlackMana++;
+        break;
+      case "{B/R}":
+        // black or red mana
+        manaTotals.blackOrRedMana++;
+        break;
+      case "{B/G}":
+        // black or green mana
+        manaTotals.blackOrGreenMana++;
+        break;
+      case "{U/B}":
+        // blue or black mana
+        manaTotals.blueOrBlackMana++;
+        break;
+      case "{U/R}":
+        // blue or red mana
+        manaTotals.blueOrRedMana++;
+        break;
+      case "{R/G}":
+        // red or green mana
+        manaTotals.redOrGreenMana++;
+        break;
+      case "{R/W}":
+        // red or white mana
+        manaTotals.redOrWhiteMana++;
+        break;
+      case "{G/W}":
+        // green or white mana
+        manaTotals.greenOrWhiteMana++;
+        break;
+      case "{G/U}":
+        // green or blue mana
+        manaTotals.greenOrBlueMana++;
+        break;
+      case "{2/W}":
+        // generic mana or one white mana
+        manaTotals.genericMana = manaTotals.genericMana + 2;
+        manaTotals.whiteMana++;
+        break;
+      case "{2/U}":
+        // generic mana or one blue mana
+        manaTotals.genericMana = manaTotals.genericMana + 2;
+        manaTotals.blueMana++;
+        break;
+      case "{2/B}":
+        // generic mana or one black mana
+        manaTotals.genericMana = manaTotals.genericMana + 2;
+        manaTotals.blackMana++;
+        break;
+      case "{2/R}":
+        // generic mana or one red mana
+        manaTotals.genericMana = manaTotals.genericMana + 2;
+        manaTotals.redMana++;
+        break;
+      case "{2/G}":
+        // generic mana or one green mana
+        manaTotals.genericMana = manaTotals.genericMana + 2;
+        manaTotals.greenMana++;
+        break;
+      case "{P}":
+        // colored mana or two life
+        manaTotals.coloredOrLife++;
+        break;
+      case "{W/P}":
+        // white mana or two life
+        manaTotals.whiteOrLife++;
+        break;
+      case "{U/P}":
+        // blue mana or two life
+        manaTotals.blueOrLife++;
+        break;
+      case "{B/P}":
+        // black mana or two life
+        manaTotals.blackOrLife++;
+        break;
+      case "{R/P}":
+        // red mana or two life
+        manaTotals.redOrLife++;
+        break;
+      case "{G/P}":
+        // green mana or two life
+        manaTotals.greenOrLife++;
+        break;
+      case "{HW}":
+        // half white mana
+        manaTotals.whiteMana = manaTotals.whiteMana + 0.5;
+        break;
+      case "{HR}":
+        // half red mana
+        manaTotals.redMana = manaTotals.redMana + 0.5;
+        break;
+      case "{W}":
+        // white mana
+        manaTotals.whiteMana++;
+        break;
+      case "{U}":
+        // blue mana
+        manaTotals.blueMana++;
+        break;
+      case "{B}":
+        // black mana
+        manaTotals.blackMana++;
+        break;
+      case "{R}":
+        // red mana
+        manaTotals.redMana++;
+        break;
+      case "{G}":
+        // green mana
+        manaTotals.greenMana++;
+        break;
+      case "{C}":
+        // colorless mana
+        manaTotals.colorlessMana++;
+        break;
+      case "{S}":
+        // snow mana
+        manaTotals.snowMana++;
+        break;
+      case "{X}":
+        manaTotals.xMana++;
+        break;
+      case "{Y}":
+        manaTotals.yMana++;
+        break;
+      case "{Z}":
+        manaTotals.zMana++;
+        break;
+      case "{½}":
+        manaTotals.genericMana = manaTotals.genericMana + 0.5;
+        break;
+      case "{0}":
+        console.log("zero mana ignored")
+        break;
+      default:
+        manaTotals.genericMana = manaTotals.genericMana + parseInt(mana.split("{")[1].split("}")[0]);
+    }
 
+  }
 
   render() {
 
@@ -365,8 +580,8 @@ class App extends Component {
       <CardSearch addToDeck={this.addToDeck} handleNewSearch={this.handleNewSearch} handleSearchInputChange={this.handleSearchInputChange} cardSearchState={this.state.cardSearchState} toggleSearchModal={this.toggleSearchModal} removeModal={this.removeModal} />,
       <Planechase planechaseState={this.state.planechaseState} addToPlanechaseDeck={this.addToPlanechaseDeck} addAll={this.addAll} removeAll={this.removeAll} removeCardFromGameDeck={this.removeCardFromGameDeck} startGame={this.startGame} nextCard={this.nextCard} endGame={this.endGame} />,
       <BattleCounter battleCounterState={this.state.battleCounterState} addPlayer={this.addPlayer} removeAllPlayers={this.removeAllPlayers} addCounter={this.addCounter} plusOne={this.plusOne} minusOne={this.minusOne} />,
-      <SetSearch setSearchState={this.state.setSearchState} selectSet={this.selectSet} setSearch={this.setSearch} toggleSetSearchModal={this.toggleSetSearchModal} removeSetModal={this.removeSetModal} returnToSets={this.returnToSets} />,
-      <DeckBuilder />
+      <SetSearch addToDeck={this.addToDeck} setSearchState={this.state.setSearchState} selectSet={this.selectSet} setSearch={this.setSearch} toggleSetSearchModal={this.toggleSetSearchModal} removeSetModal={this.removeSetModal} returnToSets={this.returnToSets} />,
+      <DeckBuilder deckBuilderState={this.state.deckBuilderState} />
     ]
 
     return (

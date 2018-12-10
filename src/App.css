@@ -197,6 +197,34 @@
 .addButton{
   width:100%
 }
+.deckTable{
+  text-align: left;
+
+}
+.cardLegal{
+  background-color: #28a745;
+  vertical-align: middle !important;
+  text-align: center !important;
+}
+.cardNotLegal{
+  background-color: #6c757d;
+  vertical-align: middle !important;
+  text-align: center !important;
+
+
+}
+.deckCardNumber{
+  vertical-align: middle !important;
+}
+.deckCardColor{
+  vertical-align: middle !important;
+}
+.deckCardName{
+  vertical-align: middle !important;
+}
+.deckCardMana{
+  vertical-align: middle !important;
+}
 /* General */
 .manaSymbol{
   width:1.25rem;

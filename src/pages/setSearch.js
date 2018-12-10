@@ -82,6 +82,9 @@ function CardDataModal(props) {
                 </Row>
 
             </ModalFooter>
+            <ModalFooter>
+                <Button className="addButton" onClick={event => props.addToDeck(cardData)}>Add to Deck</Button>
+            </ModalFooter>
 
 
         </Modal >
@@ -128,7 +131,7 @@ export default function SetSearch(props) {
             {!props.setSearchState.loading && !props.setSearchState.showSet ? <SetTable setSearchState={props.setSearchState} selectSet={props.selectSet} /> : ""}
 
             <SetCard setSearchState={props.setSearchState} toggleSetSearchModal={props.toggleSetSearchModal} returnToSets={props.returnToSets} />
-            <CardDataModal removeSetModal={props.removeSetModal} setSearchState={props.setSearchState} />
+            <CardDataModal removeSetModal={props.removeSetModal} setSearchState={props.setSearchState} addToDeck={props.addToDeck} />
 
         </Container >
     )
