@@ -21,6 +21,8 @@ class App extends Component {
     super(props);
     this.state = {
       pageView: 1,
+      pageViewTop: 2,
+      pageViewBottom: 6,
       planechaseState: {
         planeSearchUrl: "https://api.scryfall.com/cards/search?q=t=plane",
         allPlaneCards: [],
@@ -60,6 +62,28 @@ class App extends Component {
         deck: [],
         allMana: "",
         allManaArray: [],
+        deckColors: {
+          white: 0,
+          blue: 0,
+          red: 0,
+          black: 0,
+          green: 0,
+          colorless: 0,
+        },
+        deckLegal: {
+          standard: "",
+          future: "",
+          frontier: "",
+          modern: "",
+          legacy: "",
+          pauper: "",
+          vintage: "",
+          penny: "",
+          commander: "",
+          oneVOne: "",
+          duel: "",
+          brawl: "",
+        },
         manaTotals: {
           xMana: 0,
           yMana: 0,
@@ -88,7 +112,13 @@ class App extends Component {
           greenOrLife: 0,
           colorlessMana: 0,
           snowMana: 0,
+          twoGenericOrWhite: 0,
+          twoGenericOrBlue: 0,
+          twoGenericOrRed: 0,
+          twoGenericOrGreen: 0,
+          twoGenericOrBlack: 0,
         }
+
       }
     }
 
@@ -125,6 +155,8 @@ class App extends Component {
     // Deck Builder Functions
     this.addToDeck = this.addToDeck.bind(this);
     this.addManaCost = this.addManaCost.bind(this);
+    this.checkLegal = this.checkLegal.bind(this);
+    this.removeFromDeck = this.removeFromDeck.bind(this);
   }
 
   // Home Page Functions
@@ -387,6 +419,7 @@ class App extends Component {
   addToDeck(card) {
     let deckBuilderState = this.state.deckBuilderState;
     deckBuilderState.deck.push(card);
+    deckBuilderState.allMana = "";
     deckBuilderState.manaTotals = {
       xMana: 0,
       yMana: 0,
@@ -415,8 +448,23 @@ class App extends Component {
       greenOrLife: 0,
       colorlessMana: 0,
       snowMana: 0,
+      twoGenericOrWhite: 0,
+      twoGenericOrBlue: 0,
+      twoGenericOrRed: 0,
+      twoGenericOrGreen: 0,
+      twoGenericOrBlack: 0,
     }
-    deckBuilderState.allMana = deckBuilderState.allMana + card.mana_cost;
+    deckBuilderState.deckColors = {
+      white: 0,
+      blue: 0,
+      red: 0,
+      black: 0,
+      green: 0,
+      colorless: 0,
+    }
+    this.getDeckColors(deckBuilderState.deck);
+    deckBuilderState.deck.forEach(card => this.checkLegal(card))
+    deckBuilderState.deck.forEach(card => deckBuilderState.allMana = deckBuilderState.allMana + card.mana_cost);
     deckBuilderState.allManaArray = splitMana(deckBuilderState.allMana);
     deckBuilderState.allManaArray.forEach(mana => this.addManaCost(mana))
     toast.info(card.name + " added to deck (" + deckBuilderState.deck.length + " in deck)");
@@ -424,105 +472,8 @@ class App extends Component {
   }
   addManaCost(mana) {
     let deckBuilderState = this.state.deckBuilderState,
-      manaTotals = this.state.deckBuilderState.manaTotals;
+      manaTotals = deckBuilderState.manaTotals;
     switch (mana) {
-      case "{W/U}":
-        // white or blue mana
-        manaTotals.whiteOrBlueMana++;
-        break;
-      case "{W/B}":
-        // white or black mana
-        manaTotals.whiteOrBlackMana++;
-        break;
-      case "{B/R}":
-        // black or red mana
-        manaTotals.blackOrRedMana++;
-        break;
-      case "{B/G}":
-        // black or green mana
-        manaTotals.blackOrGreenMana++;
-        break;
-      case "{U/B}":
-        // blue or black mana
-        manaTotals.blueOrBlackMana++;
-        break;
-      case "{U/R}":
-        // blue or red mana
-        manaTotals.blueOrRedMana++;
-        break;
-      case "{R/G}":
-        // red or green mana
-        manaTotals.redOrGreenMana++;
-        break;
-      case "{R/W}":
-        // red or white mana
-        manaTotals.redOrWhiteMana++;
-        break;
-      case "{G/W}":
-        // green or white mana
-        manaTotals.greenOrWhiteMana++;
-        break;
-      case "{G/U}":
-        // green or blue mana
-        manaTotals.greenOrBlueMana++;
-        break;
-      case "{2/W}":
-        // generic mana or one white mana
-        manaTotals.genericMana = manaTotals.genericMana + 2;
-        manaTotals.whiteMana++;
-        break;
-      case "{2/U}":
-        // generic mana or one blue mana
-        manaTotals.genericMana = manaTotals.genericMana + 2;
-        manaTotals.blueMana++;
-        break;
-      case "{2/B}":
-        // generic mana or one black mana
-        manaTotals.genericMana = manaTotals.genericMana + 2;
-        manaTotals.blackMana++;
-        break;
-      case "{2/R}":
-        // generic mana or one red mana
-        manaTotals.genericMana = manaTotals.genericMana + 2;
-        manaTotals.redMana++;
-        break;
-      case "{2/G}":
-        // generic mana or one green mana
-        manaTotals.genericMana = manaTotals.genericMana + 2;
-        manaTotals.greenMana++;
-        break;
-      case "{P}":
-        // colored mana or two life
-        manaTotals.coloredOrLife++;
-        break;
-      case "{W/P}":
-        // white mana or two life
-        manaTotals.whiteOrLife++;
-        break;
-      case "{U/P}":
-        // blue mana or two life
-        manaTotals.blueOrLife++;
-        break;
-      case "{B/P}":
-        // black mana or two life
-        manaTotals.blackOrLife++;
-        break;
-      case "{R/P}":
-        // red mana or two life
-        manaTotals.redOrLife++;
-        break;
-      case "{G/P}":
-        // green mana or two life
-        manaTotals.greenOrLife++;
-        break;
-      case "{HW}":
-        // half white mana
-        manaTotals.whiteMana = manaTotals.whiteMana + 0.5;
-        break;
-      case "{HR}":
-        // half red mana
-        manaTotals.redMana = manaTotals.redMana + 0.5;
-        break;
       case "{W}":
         // white mana
         manaTotals.whiteMana++;
@@ -547,9 +498,126 @@ class App extends Component {
         // colorless mana
         manaTotals.colorlessMana++;
         break;
+      case "{W/U}":
+        // white or blue mana
+        manaTotals.whiteOrBlueMana++;
+        // manaTotals.whiteMana++;
+        // manaTotals.blueMana++;
+        break;
+      case "{W/B}":
+        // white or black mana
+        manaTotals.whiteOrBlackMana++;
+        // manaTotals.whiteMana++;
+        // manaTotals.blackMana++;
+        break;
+      case "{B/R}":
+        // black or red mana
+        manaTotals.blackOrRedMana++;
+        // manaTotals.blackMana++;
+        // manaTotals.redMana++;
+        break;
+      case "{B/G}":
+        // black or green mana
+        manaTotals.blackOrGreenMana++;
+        // manaTotals.blackMana++;
+        // manaTotals.greenMana++;
+        break;
+      case "{U/B}":
+        // blue or black mana
+        manaTotals.blueOrBlackMana++;
+        // manaTotals.blueMana++;
+        // manaTotals.blackMana++;
+        break;
+      case "{U/R}":
+        // blue or red mana
+        manaTotals.blueOrRedMana++;
+        // manaTotals.blueMana++;
+        // manaTotals.redMana++;
+        break;
+      case "{R/G}":
+        // red or green mana
+        manaTotals.redOrGreenMana++;
+        // manaTotals.redMana++;
+        // manaTotals.greenMana++;
+        break;
+      case "{R/W}":
+        // red or white mana
+        manaTotals.redOrWhiteMana++;
+        // manaTotals.whiteMana++;
+        // manaTotals.redMana++;
+        break;
+      case "{G/W}":
+        // green or white mana
+        manaTotals.greenOrWhiteMana++;
+        // manaTotals.greenMana++;
+        // manaTotals.whiteMana++;
+        break;
+      case "{G/U}":
+        // green or blue mana
+        manaTotals.greenOrBlueMana++;
+        // manaTotals.greenMana++;
+        // manaTotals.blueMana++;
+        break;
+      case "{2/W}":
+        // generic mana or one white mana
+        manaTotals.twoGenericOrWhite++;
+        break;
+      case "{2/U}":
+        // generic mana or one blue mana
+        manaTotals.twoGenericOrBlue++;
+        break;
+      case "{2/B}":
+        // generic mana or one black mana
+        manaTotals.twoGenericOrBlack++;
+        break;
+      case "{2/R}":
+        // generic mana or one red mana
+        manaTotals.twoGenericOrRed++;
+        break;
+      case "{2/G}":
+        // generic mana or one green mana
+        manaTotals.twoGenericOrGreen++;
+        break;
+      case "{HW}":
+        // half white mana
+        manaTotals.whiteMana = manaTotals.whiteMana + 0.5;
+        break;
+      case "{HR}":
+        // half red mana
+        manaTotals.redMana = manaTotals.redMana + 0.5;
+        break;
       case "{S}":
         // snow mana
         manaTotals.snowMana++;
+        break;
+      case "{P}":
+        // colored mana or two life
+        manaTotals.coloredOrLife++;
+        break;
+      case "{W/P}":
+        // white mana or two life
+        manaTotals.whiteOrLife++;
+        // manaTotals.whiteMana++;
+        break;
+      case "{U/P}":
+        // blue mana or two life
+        manaTotals.blueOrLife++;
+        // manaTotals.blueMana++;
+        break;
+      case "{B/P}":
+        // black mana or two life
+        manaTotals.blackOrLife++;
+        // manaTotals.blackMana++;
+        break;
+      case "{R/P}":
+        // red mana or two life
+        manaTotals.redOrLife++;
+        // manaTotals.redMana++;
+        break;
+      case "{G/P}":
+        // green mana or two life
+        manaTotals.greenOrLife++;
+        // manaTotals.greenMana++;
         break;
       case "{X}":
         manaTotals.xMana++;
@@ -569,6 +637,117 @@ class App extends Component {
       default:
         manaTotals.genericMana = manaTotals.genericMana + parseInt(mana.split("{")[1].split("}")[0]);
     }
+  }
+  checkLegal(card) {
+    let deckBuilderState = this.state.deckBuilderState,
+      deckLegal = deckBuilderState.deckLegal;
+    deckLegal.standard = (deckLegal.standard === "not_legal" ? "not_legal" : (card.legalities.standard === "legal" ? "legal" : "not_legal"));
+    deckLegal.future = (deckLegal.future === "not_legal" ? "not_legal" : (card.legalities.future === "legal" ? "legal" : "not_legal"));
+    deckLegal.frontier = (deckLegal.frontier === "not_legal" ? "not_legal" : (card.legalities.frontier === "legal" ? "legal" : "not_legal"));
+    deckLegal.modern = (deckLegal.modern === "not_legal" ? "not_legal" : (card.legalities.modern === "legal" ? "legal" : "not_legal"));
+    deckLegal.legacy = (deckLegal.legacy === "not_legal" ? "not_legal" : (card.legalities.legacy === "legal" ? "legal" : "not_legal"));
+    deckLegal.pauper = (deckLegal.pauper === "not_legal" ? "not_legal" : (card.legalities.pauper === "legal" ? "legal" : "not_legal"));
+    deckLegal.vintage = (deckLegal.vintage === "not_legal" ? "not_legal" : (card.legalities.vintage === "legal" ? "legal" : "not_legal"));
+    deckLegal.penny = (deckLegal.penny === "not_legal" ? "not_legal" : (card.legalities.penny === "legal" ? "legal" : "not_legal"));
+    deckLegal.commander = (deckLegal.commander === "not_legal" ? "not_legal" : (card.legalities.commander === "legal" ? "legal" : "not_legal"));
+    deckLegal.oneVOne = (deckLegal.oneVOne === "not_legal" ? "not_legal" : (card.legalities["1v1"] === "legal" ? "legal" : "not_legal"));
+    deckLegal.duel = (deckLegal.duel === "not_legal" ? "not_legal" : (card.legalities.duel === "legal" ? "legal" : "not_legal"));
+    deckLegal.brawl = (deckLegal.brawl === "not_legal" ? "not_legal" : (card.legalities.brawl === "legal" ? "legal" : "not_legal"));
+  }
+  removeFromDeck(idx) {
+    let deckBuilderState = this.state.deckBuilderState;
+    deckBuilderState.deck.splice(idx, 1);
+    deckBuilderState.allMana = "";
+    deckBuilderState.deckLegal = {
+      standard: "",
+      future: "",
+      frontier: "",
+      modern: "",
+      legacy: "",
+      pauper: "",
+      vintage: "",
+      penny: "",
+      commander: "",
+      oneVOne: "",
+      duel: "",
+      brawl: "",
+    }
+    deckBuilderState.manaTotals = {
+      xMana: 0,
+      yMana: 0,
+      zMana: 0,
+      whiteOrBlueMana: 0,
+      whiteOrBlackMana: 0,
+      blackOrRedMana: 0,
+      blackOrGreenMana: 0,
+      blueOrBlackMana: 0,
+      blueOrRedMana: 0,
+      redOrGreenMana: 0,
+      redOrWhiteMana: 0,
+      greenOrWhiteMana: 0,
+      greenOrBlueMana: 0,
+      genericMana: 0,
+      whiteMana: 0,
+      blueMana: 0,
+      blackMana: 0,
+      redMana: 0,
+      greenMana: 0,
+      coloredOrLife: 0,
+      whiteOrLife: 0,
+      blueOrLife: 0,
+      blackOrLife: 0,
+      redOrLife: 0,
+      greenOrLife: 0,
+      colorlessMana: 0,
+      snowMana: 0,
+      twoGenericOrWhite: 0,
+      twoGenericOrBlue: 0,
+      twoGenericOrRed: 0,
+      twoGenericOrGreen: 0,
+      twoGenericOrBlack: 0,
+    }
+    deckBuilderState.deckColors = {
+      white: 0,
+      blue: 0,
+      red: 0,
+      black: 0,
+      green: 0,
+      colorless: 0,
+    }
+    this.getDeckColors(deckBuilderState.deck);
+    deckBuilderState.deck.forEach(card => this.checkLegal(card))
+    deckBuilderState.deck.forEach(card => deckBuilderState.allMana = deckBuilderState.allMana + card.mana_cost);
+    deckBuilderState.allManaArray = splitMana(deckBuilderState.allMana);
+    deckBuilderState.allManaArray.forEach(mana => this.addManaCost(mana))
+    console.log(this.state.deckBuilderState.allMana)
+    this.setState({ deckBuilderState: deckBuilderState });
+
+  }
+  getDeckColors(props) {
+    let deckBuilderState = this.state.deckBuilderState,
+      deck = deckBuilderState.deck;
+    deck.forEach(card => card.color_identity.length === 0 ? deckBuilderState.deckColors.colorless++ : card.color_identity.forEach(color => {
+      switch (color) {
+        case "W":
+          deckBuilderState.deckColors.white++;
+          break;
+        case "U":
+          deckBuilderState.deckColors.blue++;
+          break;
+        case "R":
+          deckBuilderState.deckColors.red++;
+          break;
+        case "B":
+          deckBuilderState.deckColors.black++;
+          break;
+        case "G":
+          deckBuilderState.deckColors.green++;
+          break;
+        default:
+          deckBuilderState.deckColors.colorless++;
+          break;
+      }
+    }))
 
   }
 
@@ -581,18 +760,25 @@ class App extends Component {
       <Planechase planechaseState={this.state.planechaseState} addToPlanechaseDeck={this.addToPlanechaseDeck} addAll={this.addAll} removeAll={this.removeAll} removeCardFromGameDeck={this.removeCardFromGameDeck} startGame={this.startGame} nextCard={this.nextCard} endGame={this.endGame} />,
       <BattleCounter battleCounterState={this.state.battleCounterState} addPlayer={this.addPlayer} removeAllPlayers={this.removeAllPlayers} addCounter={this.addCounter} plusOne={this.plusOne} minusOne={this.minusOne} />,
       <SetSearch addToDeck={this.addToDeck} setSearchState={this.state.setSearchState} selectSet={this.selectSet} setSearch={this.setSearch} toggleSetSearchModal={this.toggleSetSearchModal} removeSetModal={this.removeSetModal} returnToSets={this.returnToSets} />,
-      <DeckBuilder deckBuilderState={this.state.deckBuilderState} />
+      <DeckBuilder deckBuilderState={this.state.deckBuilderState} removeFromDeck={this.removeFromDeck} />
     ]
 
     return (
       <div className="App">
         <header className="App-header">
           <Button onClick={event => this.changePage(1)} />
+          <Button >Split 2</Button>
         </header>
         {this.findAllPlaneCards()}
         {this.findAllSets()}
         <ToastContainer />
-        {pages[this.state.pageView]}
+        {/* {pages[this.state.pageView]} */}
+        <div className="splitTopPage">
+          {pages[this.state.pageViewTop]}
+        </div>
+        <div className="splitBottomPage">
+          {pages[this.state.pageViewBottom]}
+        </div>
       </div>
     );
   }

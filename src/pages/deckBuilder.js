@@ -1,8 +1,32 @@
 import React from 'react';
-import { Col, Container, Table } from 'reactstrap';
-import PieChart from 'react-minimal-pie-chart';
+import { Button, Col, Container, Table, Row } from 'reactstrap';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import converText from '../utilities/symbolSwitch';
 import '../App.css';
+
+// let genericColor = '#bab1ab',
+//     whiteColor = "#dfdec3",
+//     blueColor = "#c1d7e9",
+//     blackColor = "#0d0f0f",
+//     redColor = "#e49977",
+//     greenColor = "#a3c095",
+//     colorlessColor = "silver",
+//     whiteOrBlueColor = "#d0dad6",
+//     whiteOrBlackColor = "#767669",
+//     blackOrRedColor = "#785443",
+//     blackOrGreenColor = "#6e827a",
+//     blueOrBlackColor = "#67737c",
+//     blueOrRedColor = "#cdc1c1",
+//     redOrGreenColor = "#c4ac86",
+//     redOrWhiteColor = "#dac0c0",
+//     greenOrWhiteColor = "#c4d0ae",
+//     greenOrBlueColor = "#b2ccbf",
+//     twoGenericOrWhite = "#d0ccb9",
+//     twoGenericOrBlue = "#bcbec1",
+//     twoGenericOrRed = "#c7aa9b",
+//     twoGenericOrGreen = "#b3b6a4",
+//     twoGenericOrBlack = "#6c6865";
+
 
 function LegalBox(legal) {
     if (legal === "legal") {
@@ -14,101 +38,102 @@ function LegalBox(legal) {
 
 }
 
-function DeckTable(props) {
+function LegalTable(props) {
     return (
-        <Table className="deckTable">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Color</th>
-                    <th>Card Name</th>
-                    <th>Mana Cost</th>
-                    <th>S.</th>
-                    <th>F.</th>
-                    <th>F.</th>
-                    <th>M.</th>
-                    <th>L.</th>
-                    <th>P.</th>
-                    <th>V.</th>
-                    <th>P.</th>
-                    <th>C.</th>
-                    <th>1.</th>
-                    <th>D.</th>
-                    <th>B.</th>
-                </tr>
-            </thead>
+        <Table className="legalTable" bordered responsive>
             <tbody>
-                {props.deckBuilderState.deck.map((card, idx) =>
-                    <tr className="deckInfo" key={idx}>
-                        <th className="deckCardNumber">{idx + 1}</th>
-                        <td className="deckCardColor">{card.color_identity}</td>
-                        <td className="deckCardName">{card.name}</td>
-                        <td className="deckCardMana">{converText(card.mana_cost)}</td>
-                        {LegalBox(card.legalities.standard)}
-                        {LegalBox(card.legalities.future)}
-                        {LegalBox(card.legalities.frontier)}
-                        {LegalBox(card.legalities.modern)}
-                        {LegalBox(card.legalities.legacy)}
-                        {LegalBox(card.legalities.pauper)}
-                        {LegalBox(card.legalities.vintage)}
-                        {LegalBox(card.legalities.penny)}
-                        {LegalBox(card.legalities.commander)}
-                        {LegalBox(card.legalities["1v1"])}
-                        {LegalBox(card.legalities.duel)}
-                        {LegalBox(card.legalities.brawl)}
-                    </tr>
-                )}
-
+                <tr>
+                    <th className={props.deckBuilderState.deckLegal.standard === "legal" ? "deckLegal" : "deckNotLegal"}>Standard</th>
+                    <th className={props.deckBuilderState.deckLegal.future === "legal" ? "deckLegal" : "deckNotLegal"}>Future</th>
+                    <th className={props.deckBuilderState.deckLegal.frontier === "legal" ? "deckLegal" : "deckNotLegal"}>Frontier</th>
+                    <th className={props.deckBuilderState.deckLegal.modern === "legal" ? "deckLegal" : "deckNotLegal"}>Modern</th>
+                </tr>
+                <tr>
+                    <th className={props.deckBuilderState.deckLegal.legacy === "legal" ? "deckLegal" : "deckNotLegal"}>Legacy</th>
+                    <th className={props.deckBuilderState.deckLegal.pauper === "legal" ? "deckLegal" : "deckNotLegal"}>Pauper</th>
+                    <th className={props.deckBuilderState.deckLegal.vintage === "legal" ? "deckLegal" : "deckNotLegal"}>Vintage</th>
+                    <th className={props.deckBuilderState.deckLegal.penny === "legal" ? "deckLegal" : "deckNotLegal"}>Penny</th>
+                </tr>
+                <tr>
+                    <th className={props.deckBuilderState.deckLegal.commander === "legal" ? "deckLegal" : "deckNotLegal"}>Commander</th>
+                    <th className={props.deckBuilderState.deckLegal.oneVOne === "legal" ? "deckLegal" : "deckNotLegal"}>1v1</th>
+                    <th className={props.deckBuilderState.deckLegal.duel === "legal" ? "deckLegal" : "deckNotLegal"}>Duel</th>
+                    <th className={props.deckBuilderState.deckLegal.brawl === "legal" ? "deckLegal" : "deckNotLegal"}>Brawl</th>
+                </tr>
             </tbody>
         </Table>
     )
 }
 
-
+function DeckTable(props) {
+    return (
+        <Table className="deckTable" responsive bordered>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Color</th>
+                    <th>Card Name</th>
+                    <th>Mana Cost</th>
+                    <th className="deckText">Text</th>
+                </tr>
+            </thead>
+            <tbody>
+                {props.deckBuilderState.deck.map((card, idx) =>
+                    <tr className="deckInfo" key={idx}>
+                        <th className="deckRemoveCard"><Button className="removeFromDeckButton" onClick={event => props.removeFromDeck(idx)}><i className="fas fa-times" /></Button></th>
+                        <td className="deckCardColor">{card.color_identity}</td>
+                        <td className="deckCardName">{card.name}</td>
+                        <td className="deckCardMana">{converText(card.mana_cost)}</td>
+                        <td className="deckText">{card.oracle_text}</td>
+                    </tr>
+                )}
+            </tbody>
+        </Table>
+    )
+}
 
 export default function DeckBuilder(props) {
+    const data = [
+        {
+            name: 'Deck Colors', white: props.deckBuilderState.deckColors.white,
+            blue: props.deckBuilderState.deckColors.blue,
+            black: props.deckBuilderState.deckColors.black,
+            red: props.deckBuilderState.deckColors.red,
+            green: props.deckBuilderState.deckColors.green,
+            colorless: props.deckBuilderState.deckColors.colorless
+        },
+
+    ];
     return (
-        <Container>
-            <Col xs="3">
-
-                <PieChart lineWidth="30"
-                    data={[
-                        { title: 'X Mana', value: props.deckBuilderState.manaTotals.xMana, color: '#b0a4a6' },
-                        { title: 'Y Mana', value: props.deckBuilderState.manaTotals.yMana, color: '#b0a4a6' },
-                        { title: 'Z Mana', value: props.deckBuilderState.manaTotals.zMana, color: '#b0a4a6' },
-                        { title: 'whiteOrBlueMana', value: props.deckBuilderState.manaTotals.whiteOrBlueMana, color: "#dfdec3" },
-                        { title: 'whiteOrBlackMana', value: props.deckBuilderState.manaTotals.whiteOrBlackMana, color: "#dfdec3" },
-                        { title: 'blackOrRedMana', value: props.deckBuilderState.manaTotals.blackOrRedMana, color: "black" },
-                        { title: 'blackOrGreenMana', value: props.deckBuilderState.manaTotals.blackOrGreenMana, color: "black" },
-                        { title: 'blueOrBlackMana', value: props.deckBuilderState.manaTotals.blueOrBlackMana, color: "blue" },
-                        { title: 'blueOrRedMana', value: props.deckBuilderState.manaTotals.blueOrRedMana, color: "blue" },
-                        { title: 'redOrGreenMana', value: props.deckBuilderState.manaTotals.redOrGreenMana, color: "red" },
-                        { title: 'redOrWhiteMana', value: props.deckBuilderState.manaTotals.redOrWhiteMana, color: "red" },
-                        { title: 'greenOrWhiteMana', value: props.deckBuilderState.manaTotals.greenOrWhiteMana, color: "green" },
-                        { title: 'greenOrBlueMana', value: props.deckBuilderState.manaTotals.greenOrBlueMana, color: "green" },
-                        { title: 'genericMana', value: props.deckBuilderState.manaTotals.genericMana, color: '#b0a4a6' },
-                        { title: 'whiteMana', value: props.deckBuilderState.manaTotals.whiteMana, color: "#dfdec3" },
-                        { title: 'blueMana', value: props.deckBuilderState.manaTotals.blueMana, color: "blue" },
-                        { title: 'blackMana', value: props.deckBuilderState.manaTotals.blackMana, color: "black" },
-                        { title: 'redMana', value: props.deckBuilderState.manaTotals.redMana, color: "red" },
-                        { title: 'greenMana', value: props.deckBuilderState.manaTotals.greenMana, color: "green" },
-                        { title: 'coloredOrLife', value: props.deckBuilderState.manaTotals.coloredOrLife, color: "#b0a4a6" },
-                        { title: 'whiteOrLife', value: props.deckBuilderState.manaTotals.whiteOrLife, color: "#dfdec3" },
-                        { title: 'blueOrLife', value: props.deckBuilderState.manaTotals.blueOrLife, color: "blue" },
-                        { title: 'blackOrLife', value: props.deckBuilderState.manaTotals.blackOrLife, color: "black" },
-                        { title: 'redOrLife', value: props.deckBuilderState.manaTotals.redOrLife, color: "red" },
-                        { title: 'greenOrLife', value: props.deckBuilderState.manaTotals.greenOrLife, color: "green" },
-                        { title: 'colorlessMana', value: props.deckBuilderState.manaTotals.colorlessMana, color: '#b0a4a6' },
-                        { title: 'snowMana', value: props.deckBuilderState.manaTotals.snowMana, color: "white" },
-
-                    ]}
-                />
-            </Col>
-            <Col xs="12">
-                {props.deckBuilderState.deck.length > 0 ? <DeckTable deckBuilderState={props.deckBuilderState} /> : ""}
+        <Container className="DeckBuilder">
+            <Row>
+                <Col xs="12" md={{ size: "6" }}>
+                    <LegalTable deckBuilderState={props.deckBuilderState} />
+                </Col>
+                <Col xs="6">
+                    <ResponsiveContainer width="100%"  >
+                        <BarChart data={data}
+                            margin={{ top: 10, left: 0 }}>
+                            <XAxis dataKey="name" />
+                            <Tooltip cursor={false} />
+                            <Bar dataKey="white" fill="#f8f6d8" />
+                            <Bar dataKey="blue" fill="#c1d7e9" />
+                            <Bar dataKey="black" fill="#0d0f0f" />
+                            <Bar dataKey="red" fill="#e49977" />
+                            <Bar dataKey="green" fill="#a3c095" />
+                            <Bar dataKey="colorless" fill="silver" />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </Col>
+            </Row>
+            <Col lg="12" xs="12">
+                <Row>
+                    {props.deckBuilderState.deck.length > 0 ? <DeckTable deckBuilderState={props.deckBuilderState} removeFromDeck={props.removeFromDeck} /> : ""}
+                </Row>
             </Col>
         </Container >
     )
 }
+
 
 
