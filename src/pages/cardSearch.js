@@ -74,7 +74,7 @@ function CardDataModal(props) {
 
 function Card(props) {
     return (
-        <Col xs="6" md="3" className="searchResultsCard ">
+        <Col xs="3" md="3" className="searchResultsCard ">
             <Button className="scale-in-center-2sDelay" onClick={event => props.toggleSearchModal(props.card)}>
                 <img src={props.card.image_uris.border_crop} style={{ width: "100%" }} alt="" />
             </Button>

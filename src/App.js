@@ -766,19 +766,18 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <Button onClick={event => this.changePage(1)} />
-          <Button >Split 2</Button>
+          <Button onClick={event => this.changePage(1)}>Home</Button>
         </header>
         {this.findAllPlaneCards()}
         {this.findAllSets()}
         <ToastContainer />
-        {/* {pages[this.state.pageView]} */}
-        <div className="splitTopPage">
+        {pages[this.state.pageView]}
+        {/* <div className="splitTopPage">
           {pages[this.state.pageViewTop]}
         </div>
         <div className="splitBottomPage">
           {pages[this.state.pageViewBottom]}
-        </div>
+        </div> */}
       </div>
     );
   }
