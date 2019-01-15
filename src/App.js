@@ -172,8 +172,7 @@ class App extends Component {
   }
   handleNewSearch(event) {
     let cardSearchState = this.state.cardSearchState,
-      searchUrl = cardSearchState.searchUrl,
-      self = this;
+      searchUrl = cardSearchState.searchUrl;
     cardSearchState.cardList = [];
     // only search if there is a value in the search field
     if (cardSearchState.inputValueCardName.length > 0) {
@@ -190,7 +189,7 @@ class App extends Component {
               if (card.image_uris) {
                 cardSearchState.cardList.push(card)
                 cardSearchState.badSearch = false;
-                self.setState({ cardSearchState: cardSearchState })
+                this.setState({ cardSearchState: cardSearchState })
               } else {
                 console.log(card.name + " omited from results because of an error")
               }
@@ -199,7 +198,7 @@ class App extends Component {
             toast.error("😭 Found nothing ")
             cardSearchState.cardList = [];
             cardSearchState.badSearch = true;
-            self.setState({ cardSearchState: cardSearchState })
+            this.setState({ cardSearchState: cardSearchState })
             console.log("No Similar Cards")
           }
         }
@@ -228,13 +227,12 @@ class App extends Component {
   }
   // Planchase Functions
   findAllPlaneCards(props) {
-    let planechaseState = this.state.planechaseState,
-      self = this;
+    let planechaseState = this.state.planechaseState;
     if (planechaseState.allPlaneCards.length === 0) {
       axios.get(planechaseState.planeSearchUrl)
-        .then(function (response) {
+        .then(response => {
           planechaseState.allPlaneCards = response.data.data
-          self.setState({ planechaseState: planechaseState })
+          this.setState({ planechaseState: planechaseState })
         })
         .catch(function (error) {
           console.log(error);
@@ -345,13 +343,12 @@ class App extends Component {
   }
   // Set Search Functions
   findAllSets() {
-    let setSearchState = this.state.setSearchState,
-      self = this;
+    let setSearchState = this.state.setSearchState;
     if (setSearchState.allSets.length === 0) {
       axios.get(setSearchState.setSearchUrl)
-        .then(function (response) {
+        .then(response => {
           setSearchState.allSets = response.data.data;
-          self.setState({ setSearchState: setSearchState });
+          this.setState({ setSearchState: setSearchState });
 
         })
         .catch(function (error) {
@@ -369,23 +366,22 @@ class App extends Component {
 
   }
   setSearch(uri) {
-    let setSearchState = this.state.setSearchState,
-      self = this;
+    let setSearchState = this.state.setSearchState;
     setSearchState.loading = true;
 
     axios.get(uri)
-      .then(function (response) {
+      .then(response => {
         if (response.data.has_more) {
           response.data.data.forEach(card => setSearchState.setData.push(card));
           setSearchState.loading = true;
-          self.setState({ setSearchState: setSearchState });
-          self.setSearch(response.data.next_page)
+          this.setState({ setSearchState: setSearchState });
+          this.setSearch(response.data.next_page)
           console.log(setSearchState.setData)
         } else {
           response.data.data.forEach(card => setSearchState.setData.push(card));
           setSearchState.loading = false;
           setSearchState.showSet = true;
-          self.setState({ setSearchState: setSearchState });
+          this.setState({ setSearchState: setSearchState });
           console.log(setSearchState.setData)
         }
       })
